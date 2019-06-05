@@ -1,13 +1,22 @@
 import numpy as np
 from scipy.spatial import Delaunay
 
-def alpha_shape(x, alpha_std = 0.0):
+def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.001):
+    if epsilon is not None:
+        # jiggle the points a little, so less holes form, as the 3D Delaunay
+        # triangulation seeks to create tetrahedrons, while we want surface triangles
+        x_perturbed = x + epsilon * np.random.random(x.shape)
+        x = np.concatenate((x, x_perturbed))
+
     triangles = set() # set of sets of 3D points (tuples)
     DT = Delaunay(x) # 3D Delaunay triangulation
 
     idx_pointer, indexes = DT.vertex_neighbor_vertices
     min_dists = []
 
+    # compute the alpha value by averaging the distance to nearby points
+    # based on the Delaunay triangulation, for simplicity and speed
+    # each point should only be connected to a few other points in the triangulation
     for i in range(DT.points.shape[0]):
         for j in range(idx_pointer[i], idx_pointer[i + 1]):
             min_dists.append(np.linalg.norm(DT.points[i] - DT.points[indexes[j]]))
@@ -21,6 +30,7 @@ def alpha_shape(x, alpha_std = 0.0):
         r = circumscribed_radius(DT.points[simplex_idx])
 
         if r < alpha:
+            # add faces of the tetrahedron to the boundary set, and remove inner faces that are repeated
             tri_a = frozenset({simplex_idx[0], simplex_idx[1], simplex_idx[2]})
             tri_b = frozenset({simplex_idx[0], simplex_idx[1], simplex_idx[3]})
             tri_c = frozenset({simplex_idx[0], simplex_idx[2], simplex_idx[3]})
@@ -39,6 +49,7 @@ def alpha_shape(x, alpha_std = 0.0):
 
     return DT.points, np.array(res)
 
+# helper to compute the circumscribed circle's radius of a tetrahedron
 def circumscribed_radius(simplex):
     a, b, c, d = simplex
     V = np.linalg.norm(np.dot(b - a, np.cross(c - a, d - a))) / 6.0 # volume
