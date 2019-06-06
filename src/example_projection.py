@@ -6,7 +6,7 @@ from projection import project_point_to_triangle
 tri = np.array([[0, 0, 0], [0, 1, 0], [1, 1, 0]])
 p_perturb = np.array([1.5, 1.5, 0.5])
 
-p_proj = project_point_to_triangle(p_perturb, tri)
+p_proj = project_point_to_triangle(p_perturb, tri, thickness = 0.1)
 
 p = np.average(tri, axis = 0)
 

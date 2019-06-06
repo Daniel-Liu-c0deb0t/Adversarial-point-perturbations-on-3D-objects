@@ -1,6 +1,6 @@
 import numpy as np
 
-def project_point_to_triangle(p_perturb, tri):
+def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
     p = np.average(tri, axis = 0) # get centroid
 
     if np.all(np.isclose(p, p_perturb)): # no projection if perturbation is close to centroid
@@ -11,9 +11,24 @@ def project_point_to_triangle(p_perturb, tri):
     n = np.cross(B - A, C - A) # find normal vector
     n = n / np.linalg.norm(n) # normalize
 
-    p_proj = p_perturb - n * np.dot(p_perturb - A, n) # project point onto the triangle's plane
+    # vector perpendicular to the triangle's plane, from plane to p_perturb
+    proj_perpendicular = n * np.dot(p_perturb - A, n)
+    # vector that describes the thickness of each triangle
+    tri_width = thickness * proj_perpendicular / np.linalg.norm(proj_perpendicular)
+
+    if np.linalg.norm(proj_perpendicular) > np.linalg.norm(tri_width):
+        p_proj = p_perturb - proj_perpendicular + tri_width # project and offset due to the thickness
+        proj_offset = tri_width
+    else:
+        p_proj = p_perturb # keep perturbation since it is in the thick triangle
+        proj_offset = proj_perpendicular
 
     # next, the projection is clipped to be within the triangle
+
+    p = p + proj_offset # ensure that the centroid and projected perturbation are on the same plane
+
+    if np.all(np.isclose(p, p_proj)): # no border intersection if projection is on the centroid
+        return p_proj
 
     # create the planes that represent the borders of the triangle, which are perpendicular to the triangle
     # border planes are used to bypass floating point calculation issues
@@ -26,11 +41,11 @@ def project_point_to_triangle(p_perturb, tri):
 
     for plane, plane_n in zip(border_planes, border_planes_n):
         plane_p = plane[0]
-        direction = np.dot(p_to_p_proj, plane_n)
+        distance = np.dot(p_to_p_proj, plane_n)
 
-        if not np.isclose(direction, 0.0):
+        if not np.isclose(distance, 0.0):
             # otherwise, the plane and perturbation are parallel, so no intersection
-            d = -np.dot(p - plane_p, plane_n) / direction
+            d = -np.dot(p - plane_p, plane_n) / distance
 
             if 0.0 < d <= 1.0:
                 intersection_points.append(p + d * p_to_p_proj)
