@@ -4,10 +4,11 @@ from mpl_toolkits.mplot3d import Axes3D
 from projection import project_point_to_triangle
 
 tri = np.array([[0, 0, 0], [0, 1, 0], [1, 1, 0]])
-p = np.array([0.1, 0.1, 0])
 p_perturb = np.array([1.5, 1.5, 0.5])
 
-p_proj = project_point_to_triangle(p, p_perturb, tri)
+p_proj = project_point_to_triangle(p_perturb, tri)
+
+p = np.average(tri, axis = 0)
 
 plt.figure(figsize = (15, 15))
 plt.subplot(111, projection = "3d")

@@ -1,7 +1,9 @@
 import numpy as np
 
-def project_point_to_triangle(p, p_perturb, tri):
-    if np.all(np.isclose(p, p_perturb)): # no projection if perturbation is too small
+def project_point_to_triangle(p_perturb, tri):
+    p = np.average(tri, axis = 0) # get centroid
+
+    if np.all(np.isclose(p, p_perturb)): # no projection if perturbation is close to centroid
         return p_perturb
 
     A, B, C = tri
