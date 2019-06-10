@@ -56,3 +56,41 @@ class PerturbProjTree:
         outside_node = self.build(curr_triangles[outside_idx], curr_tri_center[outside_idx], curr_tri_radius[outside_idx])
 
         return Node(partition_center, partition_radius, inside_node, outside_node)
+
+    def project(self, x_perturb, perturb):
+        distances = np.linalg.norm(perturb, axis = 1)
+        x_proj = []
+
+        for point, dist in zip(x_perturb, distances):
+            nearest_point, nearest_dist = self.query(point, dist)
+            x_proj.append(nearest_point)
+
+        return np.vstack(x_proj)
+
+    def query(self, query_point, query_radius, curr_node):
+        nearest = (None, float("inf"))
+
+        if type(curr_node) == Leaf:
+            for tri in curr_node.bucket:
+                proj_point = project_point_to_triangle(query_point, tri, thickness = thickness)
+                proj_dist = np.linalg.norm(query_point - proj_point)
+
+                if proj_dist < nearest[1]:
+                    nearest = (proj_point, proj_dist)
+        elif type(curr_node) == Node:
+            dist = np.linalg.norm(query_point - curr_node.center)
+
+            if dist > curr_node.radius + query_radius: # query and partition completely not overlapping
+                nearest = self.query(query_point, query_radius, curr_node.outside_node)
+            elif dist <= curr_node.radius - query_radius: # query and partition completely overlapping
+                nearest = self.query(query_point, query_radius, curr_node.inside_node)
+            else: # must examine both subtrees as the query border overlaps the partition border
+                nearest_inside = self.query(query_point, query_radius, curr_node.inside_node)
+                nearest_outside = self.query(query_point, query_radius, curr_node.outside_node)
+
+                if nearest_inside[1] < nearest_outside[1]:
+                    nearest = nearest_inside
+                else:
+                    nearest = nearest_outside
+
+        return nearest
