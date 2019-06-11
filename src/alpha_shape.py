@@ -5,7 +5,7 @@ def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.001):
     if epsilon is not None:
         # jiggle the points a little, so less holes form, as the 3D Delaunay
         # triangulation seeks to create tetrahedrons, while we want surface triangles
-        x_perturbed = x + epsilon * np.random.random(x.shape)
+        x_perturbed = x + epsilon * np.random.random(x.shape) * np.random.choice(np.array([-1, 1]), size = x.shape)
         x = np.concatenate((x, x_perturbed))
 
     triangles = set() # set of sets of 3D points (tuples)

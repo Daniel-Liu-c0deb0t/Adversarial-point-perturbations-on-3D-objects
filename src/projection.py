@@ -1,7 +1,7 @@
 import numpy as np
 
 def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
-    p = np.average(tri, axis = 0) # get centroid
+    p = np.mean(tri, axis = 0) # get centroid
 
     if np.all(np.isclose(p, p_perturb)): # no projection if perturbation is close to centroid
         return p_perturb
@@ -13,10 +13,14 @@ def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
 
     # vector perpendicular to the triangle's plane, from plane to p_perturb
     proj_perpendicular = n * np.dot(p_perturb - A, n)
+    proj_perpendicular_norm = np.linalg.norm(proj_perpendicular)
     # vector that describes the thickness of each triangle
-    tri_width = thickness * proj_perpendicular / np.linalg.norm(proj_perpendicular)
+    if np.isclose(proj_perpendicular_norm, 0.0):
+        tri_width = 0.0
+    else:
+        tri_width = thickness * proj_perpendicular / proj_perpendicular_norm
 
-    if np.linalg.norm(proj_perpendicular) > np.linalg.norm(tri_width):
+    if proj_perpendicular_norm > np.linalg.norm(tri_width):
         p_proj = p_perturb - proj_perpendicular + tri_width # project and offset due to the thickness
         proj_offset = tri_width
     else:
