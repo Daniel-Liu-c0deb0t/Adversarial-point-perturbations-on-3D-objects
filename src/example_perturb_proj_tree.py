@@ -8,7 +8,7 @@ np.random.seed(1234)
 
 view_label = "chair"
 offset_idx = 0
-num_points = 100
+num_points = 1024
 f = np.load("/media/sf_Xubuntu_shared/modelnet40_pc/point_clouds.npz")
 shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
 
@@ -34,7 +34,7 @@ def scale_plot():
 
 plt.subplot(111, projection = "3d")
 
-alpha_points, alpha_triangles = alpha_shape_border(view_pc, alpha_std = 0.0, epsilon = 0.001)
+alpha_points, alpha_triangles = alpha_shape_border(view_pc, alpha_std = -0.3, epsilon = 0.001)
 alpha_points = alpha_points[:, (0, 2, 1)]
 
 print("Number of points in alpha shape:", alpha_points.shape[0])
@@ -42,7 +42,7 @@ print("Number of triangles in alpha shape:", alpha_triangles.shape[0])
 
 plt.gca().plot_trisurf(*alpha_points.T, triangles = alpha_triangles)
 
-rand_perturb = (np.random.random(view_pc.shape) * 0.05 + 0.05) * np.random.choice(np.array([-1, 1]), size = view_pc.shape)
+rand_perturb = (np.random.random(view_pc.shape) * 0.01 + 0.05) * np.random.choice(np.array([-1, 1]), size = view_pc.shape)
 perturbed = view_pc + rand_perturb
 
 colors = np.random.random(num_points)

@@ -46,7 +46,7 @@ class PerturbProjTree:
         distances = distances_center + curr_tri_radius
 
         # pick the middle point to for the partition radius
-        mid = len(distances) // 2
+        mid = len(distances) * 3 // 5
         # sort by negative distances so all bounding spheres with the same distance
         # as the picked mid distance will be to the right in the partition array
         partition = np.argpartition(-distances, mid)
@@ -79,10 +79,16 @@ class PerturbProjTree:
     def project(self, x_perturb, perturb):
         distances = np.linalg.norm(perturb, axis = 1)
         x_proj = []
+        avg_proj_count = 0.0
 
         for point, dist in zip(x_perturb, distances):
+            self.projection_count = 0
             nearest_point, nearest_dist = self.query(point, dist, self.root)
             x_proj.append(nearest_point)
+            print("hi")
+            avg_proj_count += self.projection_count / len(x_perturb)
+
+        print("Average points projected:", avg_proj_count)
 
         return np.vstack(x_proj)
 
@@ -98,6 +104,8 @@ class PerturbProjTree:
 
                 if proj_dist < nearest[1]:
                     nearest = (proj_point, proj_dist)
+
+            self.projection_count += len(curr_node.bucket)
         elif type(curr_node) == Node:
             dist = np.linalg.norm(query_point - curr_node.center)
 
@@ -124,12 +132,12 @@ def bounding_sphere(tri):
     A_to_C = C - A
     B_to_C = C - B
 
-    if np.dot(A_to_B, A_to_C) <= 0 or np.dot(A_to_B, B_to_C) <= 0 or np.dot(A_to_C, B_to_C) <= 0:
+    if np.dot(A_to_B, A_to_C) <= 0.0 and np.dot(A_to_B, B_to_C) <= 0.0 and np.dot(A_to_C, B_to_C) <= 0.0:
         # right or obtuse triangle
         edges = np.array([np.linalg.norm(A_to_B), np.linalg.norm(A_to_C), np.linalg.norm(B_to_C)])
         idx = np.argmax(edges)
-        radius = edges[idx]
-        center = [np.mean(np.array([A, B]), axis = 0), np.mean(np.array([A, C]), axis = 0), np.mean(np.array([B, C]), axis = 0)][idx]
+        radius = edges[idx] / 2.0
+        center = np.mean(np.array([[A, B], [A, C], [B, C]][idx]), axis = 0)
     else:
         # acute triangle
         normal = np.cross(A_to_B, A_to_C)
