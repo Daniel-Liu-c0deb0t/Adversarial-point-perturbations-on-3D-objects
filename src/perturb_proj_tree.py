@@ -3,8 +3,8 @@ from projection import project_point_to_triangle, bounding_sphere
 from alpha_shape import alpha_shape_border
 from collections import namedtuple
 
-Node = namedtuple("Node", ("center", "radius", "inside_node", "outside_node"))
-Leaf = namedtuple("Leaf", ("triangle"))
+Node = namedtuple("Node", ("center", "radius_lo", "radius_hi", "inside_node", "outside_node"))
+Leaf = namedtuple("Leaf", ("center", "triangle"))
 
 # each triangle is represented as a point in the tree
 class PerturbProjTree:
@@ -35,7 +35,7 @@ class PerturbProjTree:
             return None
 
         if len(curr_triangles) == 1:
-            return Leaf(curr_triangles[0])
+            return Leaf(curr_tri_center[0], curr_triangles[0])
 
         # pick random point to partition with
         partition_center = curr_tri_center[np.random.randint(len(curr_tri_center))]
@@ -44,19 +44,21 @@ class PerturbProjTree:
         distances = np.linalg.norm(curr_tri_center - partition_center[np.newaxis, :], axis = 1)
 
         # pick the middle point to for the partition radius
-        mid = len(distances + 1) // 2
+        lo = len(distances + 1) // 2
+        hi = lo - 1
         # sort by negative distances so all triangle points with the same distance
         # as the picked mid distance will be to the right in the partition array
-        partition = np.argpartition(-distances, mid)
-        partition_radius = distances[partition[mid]]
+        partition = np.argpartition(-distances, (hi, lo))
+        partition_radius_lo = distances[partition[lo]]
+        partition_radius_hi = distances[partition[hi]]
 
-        inside_idx = partition[mid:]
-        outside_idx = partition[:mid]
+        inside_idx = partition[lo:]
+        outside_idx = partition[:lo]
 
         inside_node = self.build(curr_triangles[inside_idx], curr_tri_center[inside_idx])
         outside_node = self.build(curr_triangles[outside_idx], curr_tri_center[outside_idx])
 
-        return Node(partition_center, partition_radius, inside_node, outside_node)
+        return Node(partition_center, partition_radius_lo, partition_radius_hi, inside_node, outside_node)
 
     def project(self, x_perturb, perturb):
         distances = np.linalg.norm(perturb, axis = 1)
@@ -84,17 +86,18 @@ class PerturbProjTree:
         nearest = (None, float("inf"))
 
         if type(curr_node) == Leaf:
-            # project the point at the leaf node
-            proj_point = project_point_to_triangle(query_point, curr_node.triangle, thickness = self.thickness)
-            proj_dist = np.linalg.norm(query_point - proj_point)
-            nearest = (proj_point, proj_dist)
-            self.projection_count += 1
+            if np.linalg.norm(query_point - curr_node.center) <= query_radius:
+                # project the point at the leaf node
+                proj_point = project_point_to_triangle(query_point, curr_node.triangle, thickness = self.thickness)
+                proj_dist = np.linalg.norm(query_point - proj_point)
+                nearest = (proj_point, proj_dist)
+                self.projection_count += 1
         elif type(curr_node) == Node:
             dist = np.linalg.norm(query_point - curr_node.center)
 
-            if dist > curr_node.radius + query_radius: # query and partition spheres are completely not overlapping
+            if dist > curr_node.radius_lo + query_radius: # query and partition spheres are completely not overlapping
                 nearest = self.query(query_point, query_radius, curr_node.outside_node)
-            elif dist <= curr_node.radius - query_radius: # query and partition spheres are completely overlapping
+            elif dist < curr_node.radius_hi - query_radius: # query and partition spheres are completely overlapping
                 nearest = self.query(query_point, query_radius, curr_node.inside_node)
             else:
                 # must examine both subtrees as the border of the query sphere overlaps the border of the partition sphere
