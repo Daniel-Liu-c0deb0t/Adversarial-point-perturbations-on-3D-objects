@@ -5,7 +5,7 @@ from numba import jit
 def cross(a, b):
     return np.array((a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]))
 
-@jit(nopython = True, parallel = True)
+@jit(nopython = True)
 def norm(a):
     return np.sqrt(np.sum(a ** 2, axis = 1))
 
@@ -79,3 +79,31 @@ def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
     p_clip = intersection_points[np.argmin(intersection_dists)]
 
     return p_clip
+
+@jit(nopython = True)
+def bounding_sphere(tri):
+    # minimum bounding sphere of 3D triangle
+    A = tri[0]
+    B = tri[1]
+    C = tri[2]
+    A_to_B = B - A
+    A_to_C = C - A
+    B_to_C = C - B
+
+    if np.dot(A_to_B, A_to_C) <= 0.0 and np.dot(A_to_B, B_to_C) <= 0.0 and np.dot(A_to_C, B_to_C) <= 0.0:
+        # right or obtuse triangle
+        edges = np.array((np.linalg.norm(A_to_B), np.linalg.norm(A_to_C), np.linalg.norm(B_to_C)))
+        idx = np.argmax(edges)
+        radius = edges[idx] / 2.0
+        a = np.vstack((A, B, A, C, B, C))
+        b = a[idx * 2:idx * 2 + 1]
+        center = np.sum(b, axis = 0) / 2.0
+    else:
+        # acute triangle
+        normal = cross(A_to_B, A_to_C)
+        # get the center of the bounding sphere
+        center = A + (np.sum(A_to_B ** 2) * cross(A_to_C, normal) + np.sum(A_to_C ** 2) * cross(normal, A_to_B)) / (np.sum(normal ** 2) * 2.0)
+        # get the radius of the bounding sphere
+        radius = np.max(norm(tri - center))
+
+    return center, radius

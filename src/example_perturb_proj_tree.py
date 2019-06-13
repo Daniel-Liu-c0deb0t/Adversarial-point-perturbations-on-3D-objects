@@ -25,16 +25,16 @@ view_pc = pc[match_idx[offset_idx]]
 
 print("Shape index:", match_idx[offset_idx])
 
-plt.figure(figsize = (15, 15))
+plt.figure(figsize = (30, 15))
 
 def scale_plot():
     plt.gca().auto_scale_xyz((-1, 1), (-1, 1), (-1, 1))
     plt.gca().view_init(0, 0)
     plt.axis("off")
 
-plt.subplot(111, projection = "3d")
+plt.subplot(121, projection = "3d")
 
-alpha_points, alpha_triangles = alpha_shape_border(view_pc, alpha_std = -0.3, epsilon = 0.001)
+alpha_points, alpha_triangles = alpha_shape_border(view_pc, alpha_std = 0.0, epsilon = 0.001)
 alpha_points = alpha_points[:, (0, 2, 1)]
 
 print("Number of points in alpha shape:", alpha_points.shape[0])
@@ -42,16 +42,22 @@ print("Number of triangles in alpha shape:", alpha_triangles.shape[0])
 
 plt.gca().plot_trisurf(*alpha_points.T, triangles = alpha_triangles)
 
-rand_perturb = (np.random.random(view_pc.shape) * 0.01 + 0.05) * np.random.choice(np.array([-1, 1]), size = view_pc.shape)
+rand_perturb = (np.random.random(view_pc.shape) * 0.01 + 0.01) * np.random.choice(np.array([-1, 1]), size = view_pc.shape)
 perturbed = view_pc + rand_perturb
 
 colors = np.random.random(num_points)
-plt.gca().scatter(*perturbed.T, zdir = "y", s = 200, c = colors, cmap = "rainbow")
+plt.gca().scatter(*perturbed.T, zdir = "y", s = 300, c = colors, cmap = "rainbow")
 
-tree = PerturbProjTree(perturbed, thickness = 0.01)
+scale_plot()
+
+plt.subplot(122, projection = "3d")
+
+plt.gca().plot_trisurf(*alpha_points.T, triangles = alpha_triangles)
+
+tree = PerturbProjTree(view_pc, thickness = 0.03)
 projected = tree.project(perturbed, rand_perturb)
 
-plt.gca().scatter(*projected.T, zdir = "y", s = 200, marker = "v", c = colors, cmap = "rainbow")
+plt.gca().scatter(*projected.T, zdir = "y", s = 300, c = colors, cmap = "rainbow")
 
 scale_plot()
 

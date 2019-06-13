@@ -1,11 +1,12 @@
 import numpy as np
-from projection import project_point_to_triangle
+from projection import project_point_to_triangle, bounding_sphere
 from alpha_shape import alpha_shape_border
 from collections import namedtuple
 
 Node = namedtuple("Node", ("center", "radius", "inside_node", "outside_node"))
-Leaf = namedtuple("Leaf", ("bucket"))
+Leaf = namedtuple("Leaf", ("triangle"))
 
+# each triangle is represented as a point in the tree
 class PerturbProjTree:
     def __init__(self, x, alpha_std = 0.0, thickness = 0.0):
         self.thickness = thickness
@@ -14,7 +15,7 @@ class PerturbProjTree:
         border_points, border_tri = alpha_shape_border(x, alpha_std = alpha_std)
         triangles = []
         tri_center = []
-        tri_radius = []
+        self.max_radius = 0.0
 
         for tri in border_tri:
             # get the minimum bounding sphere of each triangle
@@ -22,57 +23,38 @@ class PerturbProjTree:
             center, radius = bounding_sphere(tri)
             triangles.append(tri)
             tri_center.append(center)
-            tri_radius.append(radius + self.thickness)
+            self.max_radius = max(self.max_radius, radius)
 
         triangles = np.array(triangles)
         tri_center = np.vstack(tri_center)
-        tri_radius = np.array(tri_radius)
 
-        self.root = self.build(triangles, tri_center, tri_radius)
+        self.root = self.build(triangles, tri_center)
 
-    def build(self, curr_triangles, curr_tri_center, curr_tri_radius):
+    def build(self, curr_triangles, curr_tri_center):
         if len(curr_triangles) == 0:
             return None
 
         if len(curr_triangles) == 1:
-            return Leaf(curr_triangles)
+            return Leaf(curr_triangles[0])
 
         # pick random point to partition with
         partition_center = curr_tri_center[np.random.randint(len(curr_tri_center))]
 
-        # get distances from each triangle's bounding circle to the partition point
-        distances_center = np.linalg.norm(curr_tri_center - partition_center[np.newaxis, :], axis = 1)
-        # get the distance from partition point to farthest point of each bounding circle
-        distances = distances_center + curr_tri_radius
+        # get distances from each triangle's point to the partition point
+        distances = np.linalg.norm(curr_tri_center - partition_center[np.newaxis, :], axis = 1)
 
         # pick the middle point to for the partition radius
-        mid = len(distances) * 3 // 5
-        # sort by negative distances so all bounding spheres with the same distance
+        mid = len(distances + 1) // 2
+        # sort by negative distances so all triangle points with the same distance
         # as the picked mid distance will be to the right in the partition array
         partition = np.argpartition(-distances, mid)
         partition_radius = distances[partition[mid]]
 
-        # bounding spheres that are completely within the partition sphere are counted as inside
-        # bounding spheres that are completely outside the partition sphere are counted as outside
-        # bounding spheres that straddle the partiton sphere are counted as both inside and outside
-        # if a bounding sphere is tangent to the partition sphere, then it is counted as either
-        # inside, or both inside and outside, depending on the position of the bounding sphere
-
-        # if the distance from the partition point to the farthest point in a boundary sphere is less
-        # than or equal to the radius of the partition sphere, then the bounding sphere is definitely inside
-        # if the aforementioned distance is greater than the partition radius, then the bounding sphere may be
-        # either inside, or both inside and outside, and distances must be checked to find the truth
         inside_idx = partition[mid:]
         outside_idx = partition[:mid]
-        both_inside_outside = np.nonzero(distances_center[outside_idx] - curr_tri_radius[outside_idx] <= partition_radius)[0]
-        inside_idx = np.concatenate((inside_idx, both_inside_outside))
 
-        if len(inside_idx) == len(curr_triangles):
-            # if the attempt to partition bounding spheres fails, then a bucket that stores a list of triangles is built
-            return Leaf(curr_triangles)
-
-        inside_node = self.build(curr_triangles[inside_idx], curr_tri_center[inside_idx], curr_tri_radius[inside_idx])
-        outside_node = self.build(curr_triangles[outside_idx], curr_tri_center[outside_idx], curr_tri_radius[outside_idx])
+        inside_node = self.build(curr_triangles[inside_idx], curr_tri_center[inside_idx])
+        outside_node = self.build(curr_triangles[outside_idx], curr_tri_center[outside_idx])
 
         return Node(partition_center, partition_radius, inside_node, outside_node)
 
@@ -82,11 +64,16 @@ class PerturbProjTree:
         avg_proj_count = 0.0
 
         for point, dist in zip(x_perturb, distances):
-            self.projection_count = 0
-            nearest_point, nearest_dist = self.query(point, dist, self.root)
-            x_proj.append(nearest_point)
-            print("hi")
-            avg_proj_count += self.projection_count / len(x_perturb)
+            if np.isclose(dist, 0.0): # points that are not perturbed are also not projected
+                x_proj.append(point)
+            else:
+                self.projection_count = 0
+                # query radius = the perturbation distance
+                # + maximum radius of all triangle circumcircles
+                # + thickness of each triangle
+                nearest_point, nearest_dist = self.query(point, dist + self.max_radius + self.thickness, self.root)
+                x_proj.append(nearest_point)
+                avg_proj_count += self.projection_count / len(x_perturb)
 
         print("Average points projected:", avg_proj_count)
 
@@ -97,15 +84,11 @@ class PerturbProjTree:
         nearest = (None, float("inf"))
 
         if type(curr_node) == Leaf:
-            for tri in curr_node.bucket:
-                # go through each point in the bucket and project it
-                proj_point = project_point_to_triangle(query_point, tri, thickness = self.thickness)
-                proj_dist = np.linalg.norm(query_point - proj_point)
-
-                if proj_dist < nearest[1]:
-                    nearest = (proj_point, proj_dist)
-
-            self.projection_count += len(curr_node.bucket)
+            # project the point at the leaf node
+            proj_point = project_point_to_triangle(query_point, curr_node.triangle, thickness = self.thickness)
+            proj_dist = np.linalg.norm(query_point - proj_point)
+            nearest = (proj_point, proj_dist)
+            self.projection_count += 1
         elif type(curr_node) == Node:
             dist = np.linalg.norm(query_point - curr_node.center)
 
@@ -124,26 +107,3 @@ class PerturbProjTree:
                     nearest = nearest_outside
 
         return nearest
-
-def bounding_sphere(tri):
-    # minimum bounding sphere of 3D triangle
-    A, B, C = tri
-    A_to_B = B - A
-    A_to_C = C - A
-    B_to_C = C - B
-
-    if np.dot(A_to_B, A_to_C) <= 0.0 and np.dot(A_to_B, B_to_C) <= 0.0 and np.dot(A_to_C, B_to_C) <= 0.0:
-        # right or obtuse triangle
-        edges = np.array([np.linalg.norm(A_to_B), np.linalg.norm(A_to_C), np.linalg.norm(B_to_C)])
-        idx = np.argmax(edges)
-        radius = edges[idx] / 2.0
-        center = np.mean(np.array([[A, B], [A, C], [B, C]][idx]), axis = 0)
-    else:
-        # acute triangle
-        normal = np.cross(A_to_B, A_to_C)
-        # get the center of the bounding sphere
-        center = A + (np.sum(A_to_B ** 2) * np.cross(A_to_C, normal) + np.sum(A_to_C ** 2) * np.cross(normal, A_to_B)) / (np.sum(normal ** 2) * 2.0)
-        # get the radius of the bounding sphere
-        radius = np.max(np.linalg.norm(tri - center[np.newaxis, :], axis = 1))
-
-    return center, radius
