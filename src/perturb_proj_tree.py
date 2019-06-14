@@ -1,5 +1,5 @@
 import numpy as np
-from projection import project_point_to_triangle, bounding_sphere
+from projection import project_point_to_triangle, bounding_sphere, corner_point
 from alpha_shape import alpha_shape_border
 from collections import namedtuple
 
@@ -37,8 +37,8 @@ class PerturbProjTree:
         if len(curr_triangles) == 1:
             return Leaf(curr_tri_center[0], curr_triangles[0])
 
-        # pick random point to partition with
-        partition_center = curr_tri_center[np.random.randint(len(curr_tri_center))]
+        # pick corner point to partition with
+        partition_center = corner_point(curr_tri_center)
 
         # get distances from each triangle's point to the partition point
         distances = np.linalg.norm(curr_tri_center - partition_center[np.newaxis, :], axis = 1)

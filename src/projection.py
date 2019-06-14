@@ -107,3 +107,15 @@ def bounding_sphere(tri):
         radius = np.max(norm(tri - center))
 
     return center, radius
+
+@jit(nopython = True)
+def corner_point(points):
+    res = np.full(3, -np.inf)
+
+    for i in range(len(points)):
+        diff_idx = np.nonzero(points[i] != res)[0][0]
+
+        if points[i][diff_idx] > res[diff_idx]:
+            res = points[i]
+
+    return res
