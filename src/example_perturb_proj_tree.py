@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from alpha_shape import alpha_shape_border
@@ -42,7 +43,7 @@ print("Number of triangles in alpha shape:", alpha_triangles.shape[0])
 
 plt.gca().plot_trisurf(*alpha_points.T, triangles = alpha_triangles)
 
-rand_perturb = (np.random.random(view_pc.shape) * 0.01 + 0.01) * np.random.choice(np.array([-1, 1]), size = view_pc.shape)
+rand_perturb = (np.random.random(view_pc.shape) * 0.03 + 0.03) * np.random.choice(np.array([-1, 1]), size = view_pc.shape)
 perturbed = view_pc + rand_perturb
 
 colors = np.random.random(num_points)
@@ -54,8 +55,12 @@ plt.subplot(122, projection = "3d")
 
 plt.gca().plot_trisurf(*alpha_points.T, triangles = alpha_triangles)
 
-tree = PerturbProjTree(view_pc, thickness = 0.03)
+print("Projection started.")
+start_time = time.time()
+tree = PerturbProjTree(view_pc, thickness = 0.01)
 projected = tree.project(perturbed, rand_perturb)
+end_time = time.time()
+print("Projection ended in %f seconds." % (end_time - start_time))
 
 plt.gca().scatter(*projected.T, zdir = "y", s = 300, c = colors, cmap = "rainbow")
 
