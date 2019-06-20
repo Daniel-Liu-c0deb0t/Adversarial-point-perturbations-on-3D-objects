@@ -1,17 +1,17 @@
 import numpy as np
 from numba import jit
 
-@jit(nopython = True, fastmath = True)
+@jit(nopython = True, cache = True)
 def cross(a, b):
     return np.array((a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]))
 
-@jit(nopython = True, fastmath = True)
+@jit(nopython = True, cache = True)
 def norm(a):
     return np.sqrt(np.sum(a ** 2, axis = 1))
 
-@jit(nopython = True, fastmath = True)
+@jit(nopython = True, cache = True)
 def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
-    epsilon = 1e-6
+    epsilon = 1e-8
 
     p = np.sum(tri, axis = 0) / 3.0 # get centroid
 
@@ -80,7 +80,7 @@ def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
 
     return p_clip
 
-@jit(nopython = True, fastmath = True)
+@jit(nopython = True, cache = True)
 def bounding_sphere(tri):
     # minimum bounding sphere of 3D triangle
     A = tri[0]
@@ -108,7 +108,7 @@ def bounding_sphere(tri):
 
     return center, radius
 
-@jit(nopython = True, fastmath = True)
+@jit(nopython = True, cache = True)
 def corner_point(points):
     res = np.full(3, -np.inf)
 
