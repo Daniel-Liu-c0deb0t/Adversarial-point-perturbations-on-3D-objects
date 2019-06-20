@@ -35,7 +35,7 @@ def scale_plot():
 
 plt.subplot(121, projection = "3d")
 
-alpha_points, alpha_triangles = alpha_shape_border(view_pc, alpha_std = 0.0, epsilon = 0.001)
+alpha_points, alpha_triangles = alpha_shape_border(view_pc)
 alpha_points = alpha_points[:, (0, 2, 1)]
 
 print("Number of points in alpha shape:", alpha_points.shape[0])
