@@ -23,6 +23,7 @@ class PointNet2Interface:
         saver = tf.train.Saver()
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
+        config.log_device_placement = True
         self.sess = tf.Session(config = config)
         saver.restore(self.sess, checkpoint_path)
         print("Model restored!")
