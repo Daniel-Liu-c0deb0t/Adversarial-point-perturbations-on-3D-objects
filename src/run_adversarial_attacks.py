@@ -49,6 +49,10 @@ for model_idx in test_models:
         attack_fn = attacks[attack_idx][1]
         attack_dict = attacks[attack_idx][2]
 
+        print("Model name\t%s" % model_name)
+        print("Attack name\t%s" % attack_name)
+        print("Attack parameters\t%s" % attack_dict)
+
         successfully_attacked = 0
         total_attacked = 0
         all_attacked = []
@@ -63,7 +67,7 @@ for model_idx in test_models:
             y_pred_idx = np.argmax(y_pred)
 
             if y_pred_idx == y_idx: # model makes correct prediction
-                x_adv = attack_fn(model.grad_fn, x, y, attack_dict)
+                x_adv = attack_fn(model, x, y, attack_dict)
                 y_adv_pred = model.pred_fn(x_adv)
                 y_adv_pred_idx = np.argmax(y_adv_pred)
 
@@ -83,9 +87,6 @@ for model_idx in test_models:
         print("Time\t%d" % timestamp)
         print("Number of attempted attacks\t%d" % total_attacked)
         print("Number of successful attacks\t%d" % successfully_attacked)
-        print("Model name\t%s" % model_name)
-        print("Attack name\t%s" % attack_name)
-        print("Attack parameters\t%s" % attack_dict)
         print("Data saved in\t%s" % save_file)
         print()
 
