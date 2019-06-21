@@ -5,6 +5,8 @@ from pointnet2_interface import PointNet2Interface
 import time
 import os
 
+start_time = time.time()
+
 np.random.seed(1234)
 
 models = (
@@ -52,6 +54,7 @@ for model_idx in test_models:
         print("Model name\t%s" % model_name)
         print("Attack name\t%s" % attack_name)
         print("Attack parameters\t%s" % attack_dict)
+        attack_start_time = time.time()
 
         successfully_attacked = 0
         total_attacked = 0
@@ -61,13 +64,11 @@ for model_idx in test_models:
             x = X[idx]
             t = T[idx]
             y_idx = Y[idx] # index of correct output
-            y = np.zeros(len(num_classes))
-            y[y_idx] = 1.0
             y_pred = model.pred_fn(x)
             y_pred_idx = np.argmax(y_pred)
 
             if y_pred_idx == y_idx: # model makes correct prediction
-                x_adv = attack_fn(model, x, y, attack_dict)
+                x_adv = attack_fn(model, x, y_idx, attack_dict)
                 y_adv_pred = model.pred_fn(x_adv)
                 y_adv_pred_idx = np.argmax(y_adv_pred)
 
@@ -84,10 +85,13 @@ for model_idx in test_models:
         save_file = "%s/%d_%s_%s.npz" % (output_dir, timestamp, model_name, attack_name)
         np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], t = all_attacked[4])
 
-        print("Time\t%d" % timestamp)
+        print("Current time\t%d" % timestamp)
+        print("Elapsed time\t%f" % (timestamp - attack_start_time))
         print("Number of attempted attacks\t%d" % total_attacked)
         print("Number of successful attacks\t%d" % successfully_attacked)
         print("Data saved in\t%s" % save_file)
         print()
 
     model.clean_up()
+
+print("Total elapsed time\t%f" % (time.time() - start_time))
