@@ -15,8 +15,8 @@ models = (
 test_models = (0,)
 
 attacks = (
-        ("iter_l2_1_proj", adversarial_attacks.iter_l2_1_proj, {"epsilon": 0.1, "n": 10, "tau": 0.05}),
-        ("iter_l2_n_proj", adversarial_attacks.iter_l2_n_proj, {"epsilon": 0.1, "n": 10, "tau": 0.05})
+        ("iter_l2_attack_1_proj", adversarial_attacks.iter_l2_attack_1_proj, {"epsilon": 0.1, "n": 10, "tau": 0.05}),
+        ("iter_l2_attack_n_proj", adversarial_attacks.iter_l2_attack_n_proj, {"epsilon": 0.1, "n": 10, "tau": 0.05})
 )
 
 test_attacks = (0,)
