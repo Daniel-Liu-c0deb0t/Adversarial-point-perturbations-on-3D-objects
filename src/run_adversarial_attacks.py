@@ -26,7 +26,7 @@ test_attacks = (0,)
 class_names_path = "pointnet/data/modelnet40_ply_hdf5_2048/shape_names.txt"
 input_data_path = "pointnet/point_clouds.npz"
 output_dir = "output_save"
-num_point_clouds = 100
+num_point_clouds = 10000
 max_points = 1024
 
 try:
