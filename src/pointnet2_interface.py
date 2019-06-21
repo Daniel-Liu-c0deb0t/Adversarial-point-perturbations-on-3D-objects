@@ -16,7 +16,7 @@ class PointNet2Interface:
             logits, end_points = model.get_model(self.x_pl, self.is_training)
 
         self.y_pred = tf.nn.softmax(logits)
-        self.loss = model.get_loss(logits, self.y_pl, end_points)
+        loss = model.get_loss(logits, self.y_pl, end_points)
         self.grad_loss_wrt_x = tf.gradients(loss, x_pl)[0]
 
         # load saved parameters
