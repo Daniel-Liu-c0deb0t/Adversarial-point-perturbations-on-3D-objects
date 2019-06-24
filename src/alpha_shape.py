@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.spatial import Delaunay
+from numba import jit
+from projection import cross
 
 def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.001):
     if epsilon is not None:
@@ -50,9 +52,13 @@ def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.001):
     return DT.points, np.array(res)
 
 # helper to compute the circumscribed circle's radius of a tetrahedron
+@jit(nopython = True)
 def circumscribed_radius(simplex):
-    a, b, c, d = simplex
-    V = np.linalg.norm(np.dot(b - a, np.cross(c - a, d - a))) / 6.0 # volume
+    a = simplex[0]
+    b = simplex[1]
+    c = simplex[2]
+    d = simplex[3]
+    V = np.abs(np.dot(b - a, cross(c - a, d - a))) / 6.0 # volume
     dist_a = np.linalg.norm(a - b) * np.linalg.norm(c - d)
     dist_b = np.linalg.norm(a - c) * np.linalg.norm(b - d)
     dist_c = np.linalg.norm(a - d) * np.linalg.norm(b - c)

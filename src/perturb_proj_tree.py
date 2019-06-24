@@ -3,7 +3,7 @@ from numba import jit
 from projection import project_point_to_triangle, bounding_sphere, corner_point
 from alpha_shape import alpha_shape_border
 
-@jit(nopython = True, cache = True)
+@jit(nopython = True)
 def _query(query_point, query_radius, curr_node, thickness, center, radius_lo, radius_hi, inside_node, outside_node, triangle, is_leaf):
     # project a point onto its nearest triangles and find the nearest projection location
     nearest = (None, np.inf)
@@ -33,7 +33,7 @@ def _query(query_point, query_radius, curr_node, thickness, center, radius_lo, r
 
     return nearest
 
-@jit(nopython = True, cache = True)
+@jit(nopython = True)
 def _project(x_perturb, perturb, max_radius, thickness, root, center, radius_lo, radius_hi, inside_node, outside_node, triangle, is_leaf):
     epsilon = 1e-8
     distances = np.sqrt(np.sum(perturb ** 2, axis = 1))
@@ -54,7 +54,7 @@ def _project(x_perturb, perturb, max_radius, thickness, root, center, radius_lo,
 
     return x_proj
 
-@jit(nopython = True, cache = True)
+@jit(nopython = True)
 def _calc_tri_center(border_points, border_tri):
     triangles = []
     tri_center = []
