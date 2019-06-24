@@ -87,7 +87,7 @@ class PerturbProjTree:
             nearest_point, nearest_dist = self.query(point, dist, self.root)
             x_proj.append(nearest_point)
             print("hi")
-            avg_proj_count += self.projection_count / len(x_perturb)
+            avg_proj_count += self.projection_count / float(len(x_perturb))
 
         print("Average points projected:", avg_proj_count)
 

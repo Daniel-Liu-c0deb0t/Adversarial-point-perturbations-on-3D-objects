@@ -6,7 +6,7 @@ def iter_l2_attack_n_proj(model, x, y, params):
     n = params["n"]
     tau = params["tau"]
 
-    epsilon = epsilon / n
+    epsilon = epsilon / float(n)
     tree = PerturbProjTree(x, thickness = tau)
     x_perturb = x
 
@@ -23,7 +23,7 @@ def iter_l2_attack_1_proj(model, x, y, params):
     n = params["n"]
     tau = params["tau"]
 
-    epsilon = epsilon / n
+    epsilon = epsilon / float(n)
     tree = PerturbProjTree(x, thickness = tau)
     x_perturb = x
 

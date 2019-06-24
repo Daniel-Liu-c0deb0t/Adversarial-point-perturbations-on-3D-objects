@@ -9,7 +9,7 @@ np.random.seed(1234)
 
 view_label = "chair"
 offset_idx = 0
-f = np.load("../output_save/1561158119_pointnet_iter_l2_attack_n_proj.npz")
+f = np.load("../output_save/1561257410_pointnet_iter_l2_attack_n_proj.npz")
 shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
 
 x = f["x"]
