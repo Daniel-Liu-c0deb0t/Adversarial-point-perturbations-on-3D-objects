@@ -21,7 +21,10 @@ def binary_search(a, b):
         else:
             hi = m
 
-    return hi
+    if a[hi] == b:
+        return min(hi + 1, len(a) - 1)
+    else:
+        return hi
 
 @jit(nopython = True)
 def sample_points(triangles, num_points):
@@ -40,7 +43,7 @@ def sample_points(triangles, num_points):
     total_area = prefix_areas[-1]
 
     for i in range(num_points):
-        rand = np.random.uniform(high = total_area)
+        rand = np.random.uniform(0.0, total_area)
         idx = binary_search(prefix_areas, rand)
 
         a = triangles[idx][0]
