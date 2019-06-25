@@ -28,7 +28,6 @@ def binary_search(a, b):
 
 @jit(nopython = True)
 def sample_points(triangles, num_points):
-    points = []
     prefix_areas = []
 
     for i in range(len(triangles)):
@@ -41,6 +40,7 @@ def sample_points(triangles, num_points):
 
     prefix_areas = np.array(prefix_areas)
     total_area = prefix_areas[-1]
+    points = np.empty((num_points, 3))
 
     for i in range(num_points):
         rand = np.random.uniform(0.0, total_area)
@@ -58,21 +58,21 @@ def sample_points(triangles, num_points):
             r2 = 1 - r2
 
         point = a + r1 * (c - a) + r2 * (b - a)
-        points.append(point)
+        points[i] = point
 
-    return np.array(points)
+    return points
 
 @jit(nopython = True)
 def farthest_point_sampling(triangles, initial_points, num_points, kappa = 5):
     sampled_points = sample_points(triangles, kappa * num_points)
-    curr_points = []
+    curr_points = np.empty((num_points, 3))
     dists = np.full(len(sampled_points), np.inf)
 
     for i in range(len(initial_points)):
         dists = np.minimum(dists, norm(sampled_points - initial_points[i].reshape((1, -1))))
 
     for i in range(num_points):
-        curr_points.append(sampled_points[np.argmax(dists)])
+        curr_points[i] = sampled_points[np.argmax(dists)]
         dists = np.minimum(dists, norm(sampled_points - curr_points[-1].reshape((1, -1))))
 
-    return np.array(curr_points)
+    return curr_points
