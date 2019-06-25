@@ -22,6 +22,10 @@ y_adv_pred_idx = np.argmax(y_adv_pred, axis = 1)
 print("Shape:", x.shape)
 print("Labels:", [shape_names[idx] for idx in np.unique(y_pred_idx)])
 print("Successful attacks:", np.count_nonzero(y_pred_idx != y_adv_pred_idx))
+
+avg_zero_grad = np.sum(np.all(np.isclose(x_adv - x, 0.0), axis = 2)) / float(len(x))
+print("Average number of points with zero gradients:", avg_zero_grad)
+
 print("Selected label:", view_label)
 
 match_idx = np.where(np.logical_and(y_pred_idx != y_adv_pred_idx, y_pred_idx == shape_names.index(view_label)))[0]

@@ -50,7 +50,7 @@ def iter_l2_attack_1_sampling(model, x, y, params):
         perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
         x_perturb = x_perturb + perturb
 
-    zero_grad_mask = np.all(np.isclose(x_perturb, 0.0), axis = 1)
+    zero_grad_mask = np.all(np.isclose(x_perturb - x, 0.0), axis = 1)
     not_perturbed_count = np.sum(zero_grad_mask)
     perturbed = x_perturb[np.logical_not(zero_grad_mask)]
 
@@ -61,7 +61,7 @@ def iter_l2_attack_1_sampling(model, x, y, params):
     for tri in border_triangles:
         triangles.append(border_points[tri])
 
-    sampled = farthest_point_sampling(np.array(triangles), perturbed, not_perturbed_count, kappa = 3)
+    sampled = farthest_point_sampling(np.array(triangles), perturbed, not_perturbed_count, kappa = 5)
 
     idx = 0
     x_sample = []

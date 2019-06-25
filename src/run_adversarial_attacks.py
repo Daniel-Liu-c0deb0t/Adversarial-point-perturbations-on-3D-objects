@@ -18,10 +18,11 @@ test_models = (0,)
 
 attacks = (
         ("iter_l2_attack_1_proj", adversarial_attacks.iter_l2_attack_1_proj, {"epsilon": 1.0, "n": 10, "tau": 0.05}),
-        ("iter_l2_attack_n_proj", adversarial_attacks.iter_l2_attack_n_proj, {"epsilon": 1.0, "n": 10, "tau": 0.05})
+        ("iter_l2_attack_n_proj", adversarial_attacks.iter_l2_attack_n_proj, {"epsilon": 1.0, "n": 10, "tau": 0.05}),
+        ("iter_l2_attack_1_sampling", adversarial_attacks.iter_l2_attack_1_sampling, {"epsilon": 1.0, "n": 10})
 )
 
-test_attacks = (0,)
+test_attacks = (2,)
 
 class_names_path = "pointnet/data/modelnet40_ply_hdf5_2048/shape_names.txt"
 input_data_path = "pointnet/point_clouds.npz"
