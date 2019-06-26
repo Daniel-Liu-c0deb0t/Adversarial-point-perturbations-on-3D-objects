@@ -1,5 +1,6 @@
 import numpy as np
 import adversarial_attacks
+import adversarial_defenses
 from pointnet_interface import PointNetInterface
 from pointnet2_interface import PointNet2Interface
 import time
@@ -17,6 +18,7 @@ models = (
 test_models = (0,)
 
 attacks = (
+        ("none", lambda _, x, _, _: x, {}),
         ("iter_l2_attack_1_proj", adversarial_attacks.iter_l2_attack_1_proj, {"epsilon": 1.0, "n": 10, "tau": 0.05}),
         ("iter_l2_attack", adversarial_attacks.iter_l2_attack, {"epsilon": 1.0, "n": 10}),
         ("normal_jitter", adversarial_attacks.normal_jitter, {"epsilon": 1.0, "tau": 0.05}),
@@ -25,7 +27,14 @@ attacks = (
         ("iter_l2_attack_1_sampling", adversarial_attacks.iter_l2_attack_1_sampling, {"epsilon": 1.0, "n": 10, "k": 400, "kappa": 10, "tri_all_points": True})
 )
 
-test_attacks = (2,)
+test_attacks = (6,)
+
+defenses = (
+        ("none", lambda x, _: x, {}),
+        ("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 1.0})
+)
+
+test_defenses = (1,)
 
 class_names_path = "pointnet/data/modelnet40_ply_hdf5_2048/shape_names.txt"
 input_data_path = "pointnet/point_clouds.npz"
