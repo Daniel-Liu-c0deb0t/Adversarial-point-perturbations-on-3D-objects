@@ -63,7 +63,7 @@ def sample_points(triangles, num_points):
     return points
 
 @jit(nopython = True)
-def farthest_point_sampling(triangles, initial_points, num_points, kappa = 5):
+def farthest_point_sampling(triangles, initial_points, num_points, kappa):
     sampled_points = sample_points(triangles, kappa * num_points)
     curr_points = np.empty((num_points, 3))
     dists = np.full(len(sampled_points), np.inf)
