@@ -64,46 +64,53 @@ for model_idx in test_models:
         attack_fn = attacks[attack_idx][1]
         attack_dict = attacks[attack_idx][2]
 
-        print("Model name\t%s" % model_name)
-        print("Attack name\t%s" % attack_name)
-        print("Attack parameters\t%s" % attack_dict)
-        attack_start_time = time.time()
+        for defense_idx in test_defenses:
+            defense_name = defenses[defense_idx][0]
+            defense_fn = defenses[defense_idx][1]
+            defense_dict = defenses[defense_idx][2]
 
-        successfully_attacked = 0
-        total_attacked = 0
-        all_attacked = []
+            print("Model name\t%s" % model_name)
+            print("Attack name\t%s" % attack_name)
+            print("Attack parameters\t%s" % attack_dict)
+            print("Defense name\t%s" % defense_name)
+            print("Defense parameters\t%s" % defense_dict)
+            attack_start_time = time.time()
 
-        for idx in range(len(X)):
-            x = X[idx]
-            t = T[idx]
-            y_idx = Y[idx] # index of correct output
-            y_pred = model.pred_fn(x)
-            y_pred_idx = np.argmax(y_pred)
+            successfully_attacked = 0
+            total_attacked = 0
+            all_attacked = []
 
-            if y_pred_idx == y_idx: # model makes correct prediction
-                x_adv = attack_fn(model, x, y_idx, attack_dict)
-                y_adv_pred = model.pred_fn(x_adv)
-                y_adv_pred_idx = np.argmax(y_adv_pred)
+            for idx in range(len(X)):
+                x = X[idx]
+                t = T[idx]
+                y_idx = Y[idx] # index of correct output
+                y_pred = model.pred_fn(x)
+                y_pred_idx = np.argmax(y_pred)
 
-                if y_adv_pred_idx != y_idx:
-                    successfully_attacked += 1
+                if y_pred_idx == y_idx: # model makes correct prediction
+                    x_adv = defense_fn(attack_fn(model, x, y_idx, attack_dict), defense_dict)
+                    y_adv_pred = model.pred_fn(x_adv)
+                    y_adv_pred_idx = np.argmax(y_adv_pred)
 
-                total_attacked += 1
+                    if y_adv_pred_idx != y_idx:
+                        successfully_attacked += 1
 
-                all_attacked.append((x, y_pred, x_adv, y_adv_pred, t))
+                    total_attacked += 1
 
-        all_attacked = list(zip(*all_attacked))
-        all_attacked = [np.array(a) for a in all_attacked]
-        timestamp = int(time.time())
-        save_file = "%s/%d_%s_%s.npz" % (output_dir, timestamp, model_name, attack_name)
-        np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], t = all_attacked[4])
+                    all_attacked.append((x, y_pred, x_adv, y_adv_pred, t))
 
-        print("Current time\t%d" % timestamp)
-        print("Elapsed time\t%f" % (timestamp - attack_start_time))
-        print("Number of attempted attacks\t%d" % total_attacked)
-        print("Number of successful attacks\t%d" % successfully_attacked)
-        print("Data saved in\t%s" % save_file)
-        print()
+            all_attacked = list(zip(*all_attacked))
+            all_attacked = [np.array(a) for a in all_attacked]
+            timestamp = int(time.time())
+            save_file = "%s/%d_%s_%s_%s.npz" % (output_dir, timestamp, model_name, attack_name, defense_name)
+            np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], t = all_attacked[4])
+
+            print("Current time\t%d" % timestamp)
+            print("Elapsed time\t%f" % (timestamp - attack_start_time))
+            print("Number of attempted attacks\t%d" % total_attacked)
+            print("Number of successful attacks\t%d" % successfully_attacked)
+            print("Data saved in\t%s" % save_file)
+            print()
 
     model.clean_up()
 
