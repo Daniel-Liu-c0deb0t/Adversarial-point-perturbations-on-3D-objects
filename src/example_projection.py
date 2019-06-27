@@ -8,10 +8,8 @@ p_perturb = np.array([1.5, 1.5, 0.5])
 
 p_proj = project_point_to_triangle(p_perturb, tri, thickness = 0.1)
 
-p = np.mean(tri, axis = 0)
-
 plt.figure(figsize = (15, 15))
 plt.subplot(111, projection = "3d")
-plt.gca().scatter(*np.vstack((p, p_perturb, p_proj)).T, s = 500, depthshade = False, c = ['b', 'r', 'g'])
+plt.gca().scatter(*np.vstack((p_perturb, p_proj)).T, s = 500, depthshade = False, c = ['b', 'r', 'g'])
 plt.gca().plot_trisurf(*tri.T, triangles = ((0, 1, 2)))
 plt.show()

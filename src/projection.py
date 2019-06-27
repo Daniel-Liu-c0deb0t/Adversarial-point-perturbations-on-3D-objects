@@ -12,27 +12,20 @@ def norm(a):
 @jit(nopython = True)
 def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
     epsilon = 1e-8
-
-    p = np.sum(tri, axis = 0) / 3.0 # get centroid
-
-    if np.all(np.abs(p - p_perturb) < epsilon): # no projection if perturbation is close to centroid
-        return p_perturb
-
     A = tri[0]
     B = tri[1]
     C = tri[2]
 
-    n = cross(B - A, C - A) # find normal vector
-    n = n / np.linalg.norm(n) # normalize
+    n = cross(B - A, C - A) # normal of triangle
+    n = n / np.linalg.norm(n)
 
-    # vector perpendicular to the triangle's plane, from plane to p_perturb
-    proj_perpendicular = n * np.dot(p_perturb - A, n)
+    proj_perpendicular = n * np.dot(p_perturb - A, n) # vector from triangle to p_perturb
     proj_perpendicular_norm = np.linalg.norm(proj_perpendicular)
-    # vector that describes the thickness of each triangle
+
     if np.abs(proj_perpendicular_norm) < epsilon:
-        tri_width = np.zeros(3)
+        tri_width = np.zeros(3) # perturbation is on the triangle
     else:
-        tri_width = thickness * proj_perpendicular / proj_perpendicular_norm
+        tri_width = thickness * proj_perpendicular / proj_perpendicular_norm # vector describing triangle thickness
 
     if proj_perpendicular_norm > np.linalg.norm(tri_width):
         p_proj = p_perturb - proj_perpendicular + tri_width # project and offset due to the thickness
@@ -41,44 +34,38 @@ def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
         p_proj = p_perturb # keep perturbation since it is in the thick triangle
         proj_offset = proj_perpendicular
 
-    # next, the projection is clipped to be within the triangle
+    p_proj_tri = p_perturb - proj_perpendicular # projection onto triangle, ignoring thickness
+    A_n = cross(B - A, p_proj_tri - A)
+    B_n = cross(C - B, p_proj_tri - B)
+    C_n = cross(A - C, p_proj_tri - C)
 
-    p = p + proj_offset # ensure that the centroid and projected perturbation are on the same plane
+    if np.dot(n, A_n) < 0.0 or np.dot(n, B_n) < 0.0 or np.dot(n, C_n) < 0.0: # projection not in triangle
+        border_planes = ((A, B, A + n), (A, C, A + n), (B, C, B + n))
+        border_planes_n = np.vstack((cross(n, A + n - B), cross(n, A + n - C), cross(n, B + n - C)))
+        border_planes_n = border_planes_n / norm(border_planes_n).reshape((3, 1))
 
-    if np.all(np.abs(p - p_proj) < epsilon): # no border intersection if projection is on the centroid
-        return p_proj
+        border_points = np.empty((3, 3))
 
-    # create the planes that represent the borders of the triangle, which are perpendicular to the triangle
-    # border planes are used to bypass floating point calculation issues
-    border_planes = ((A, B, A + n), (A, C, A + n), (B, C, B + n))
-    border_planes_n = np.vstack((cross(n, A + n - B), cross(n, A + n - C), cross(n, B + n - C)))
-    border_planes_n = border_planes_n / norm(border_planes_n).reshape((3, 1))
+        for i in range(3):
+            plane = border_planes[i]
+            normal = border_planes_n[i]
+            center = (plane[0] + plane[1]) / 2.0 # center and radius (half of the length) of an edge
+            radius = np.linalg.norm(center - plane[0])
+            center = center + proj_offset
+            p_plane = p_proj - normal * np.dot(p_proj - plane[0], normal) # project p_proj onto plane
 
-    at_least_one = False
-    intersection_points = np.full((3, 3), np.inf)
-    p_to_p_proj = p_proj - p
+            if np.linalg.norm(p_plane - center) > radius:
+                points = np.vstack((plane[0] + proj_offset, plane[1] + proj_offset))
+                idx = np.argmin(norm(points - p_plane)) # get closest vertex of triangle
+                border_points[i] = points[idx]
+            else:
+                border_points[i] = p_plane
 
-    for i in range(3):
-        plane_n = border_planes_n[i]
-        plane_p = border_planes[i][0]
-        distance = np.dot(p_to_p_proj, plane_n)
+        # get closest intersection point
+        border_dists = norm(p_proj - border_points)
+        p_proj = border_points[np.argmin(border_dists)]
 
-        if np.abs(distance) >= epsilon:
-            # otherwise, the plane and perturbation are parallel, so no intersection
-            d = -np.dot(p - plane_p, plane_n) / distance
-
-            if 0.0 < d <= 1.0:
-                intersection_points[i] = p + d * p_to_p_proj
-                at_least_one = True
-
-    if not at_least_one:
-        return p_proj
-
-    # get closest intersection point
-    intersection_dists = norm(intersection_points - p)
-    p_clip = intersection_points[np.argmin(intersection_dists)]
-
-    return p_clip
+    return p_proj
 
 @jit(nopython = True)
 def bounding_sphere(tri):
