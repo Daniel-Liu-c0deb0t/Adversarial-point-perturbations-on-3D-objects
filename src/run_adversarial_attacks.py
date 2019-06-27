@@ -26,9 +26,11 @@ attacks = (
         ("iter_l2_attack_n_proj", adversarial_attacks.iter_l2_attack_n_proj, {"epsilon": 1.0, "n": 10, "tau": 0.05}),
         ("mom_l2_attack_n_proj", adversarial_attacks.mom_l2_attack_n_proj, {"epsilon": 1.0, "mu": 1.0, "n": 10, "tau": 0.05}),
         ("iter_l2_attack_1_sampling", adversarial_attacks.iter_l2_attack_1_sampling, {"epsilon": 1.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": False})
+        ("iter_l2_attack_1_sampling_all", adversarial_attacks.iter_l2_attack_1_sampling_all, {"epsilon": 1.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": False})
+        ("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 1.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": False})
 )
 
-test_attacks = (6,)
+test_attacks = (8,)
 
 defenses = (
         ("none", lambda x, _a: x, {}),

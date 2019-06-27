@@ -68,10 +68,17 @@ def farthest_point_sampling(triangles, initial_points, num_points, kappa):
     curr_points = np.empty((num_points, 3))
     dists = np.full(len(sampled_points), np.inf)
 
-    for i in range(len(initial_points)):
-        dists = np.minimum(dists, norm(sampled_points - initial_points[i].reshape((1, -1))))
+    if initial_points is None:
+        dists = np.minimum(dists, norm(sampled_points - sampled_points[0].reshape((1, -1))))
+        curr_points[0] = sampled_points[0]
+        start_idx = 1
+    else:
+        for i in range(len(initial_points)):
+            dists = np.minimum(dists, norm(sampled_points - initial_points[i].reshape((1, -1))))
 
-    for i in range(num_points):
+        start_idx = 0
+
+    for i in range(start_idx, num_points):
         curr_points[i] = sampled_points[np.argmax(dists)]
         dists = np.minimum(dists, norm(sampled_points - curr_points[i].reshape((1, -1))))
 
