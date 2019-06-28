@@ -29,10 +29,8 @@ def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
 
     if proj_perpendicular_norm > np.linalg.norm(tri_width):
         p_proj = p_perturb - proj_perpendicular + tri_width # project and offset due to the thickness
-        proj_offset = tri_width
     else:
         p_proj = p_perturb # keep perturbation since it is in the thick triangle
-        proj_offset = proj_perpendicular
 
     p_proj_tri = p_perturb - proj_perpendicular # projection onto triangle, ignoring thickness
     A_n = cross(B - A, p_proj_tri - A)
@@ -51,19 +49,26 @@ def project_point_to_triangle(p_perturb, tri, thickness = 0.0):
             normal = border_planes_n[i]
             center = (plane[0] + plane[1]) / 2.0 # center and radius (half of the length) of an edge
             radius = np.linalg.norm(center - plane[0])
-            center = center + proj_offset
-            p_plane = p_proj - normal * np.dot(p_proj - plane[0], normal) # project p_proj onto plane
+            p_plane = p_proj_tri - normal * np.dot(p_proj_tri - plane[0], normal) # project p_proj_tri onto plane
 
             if np.linalg.norm(p_plane - center) > radius:
-                points = np.vstack((plane[0] + proj_offset, plane[1] + proj_offset))
+                points = np.vstack((plane[0], plane[1]))
                 idx = np.argmin(norm(points - p_plane)) # get closest vertex of triangle
                 border_points[i] = points[idx]
             else:
                 border_points[i] = p_plane
 
         # get closest intersection point
-        border_dists = norm(p_proj - border_points)
-        p_proj = border_points[np.argmin(border_dists)]
+        border_dists = norm(p_proj_tri - border_points)
+        closest_border_point = border_points[np.argmin(border_dists)]
+        closest_to_proj = p_perturb - closest_border_point
+        closest_to_proj_norm = np.linalg.norm(closest_to_proj)
+
+        # clip point to sphere with radius thickness, centered at the closest border point
+        if closest_to_proj_norm > thickness and closest_to_proj_norm >= epsilon:
+            p_proj = closest_border_point + thickness * closest_to_proj / closest_to_proj_norm
+        else:
+            p_proj = p_perturb
 
     return p_proj
 
