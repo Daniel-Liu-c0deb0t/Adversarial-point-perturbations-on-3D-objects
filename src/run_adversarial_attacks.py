@@ -33,8 +33,9 @@ attacks = (
 test_attacks = (8,)
 
 defenses = (
-        ("none", lambda x, _a: x, {}),
-        ("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 1.0})
+        ("none", lambda _a, x, _b: x, {}),
+        ("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 1.0}),
+        ("remove_salient_defense", adversarial_defenses.remove_salient_defense, {"top_k": 100})
 )
 
 test_defenses = (1,)
@@ -91,7 +92,7 @@ for model_idx in test_models:
                 y_pred_idx = np.argmax(y_pred)
 
                 if y_pred_idx == y_idx: # model makes correct prediction
-                    x_adv = defense_fn(attack_fn(model, x, y_idx, attack_dict), defense_dict)
+                    x_adv = defense_fn(model, attack_fn(model, x, y_idx, attack_dict), defense_dict)
                     y_adv_pred = model.pred_fn(x_adv)
                     y_adv_pred_idx = np.argmax(y_adv_pred)
 

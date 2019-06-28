@@ -19,6 +19,11 @@ class PointNetInterface:
         loss = model.get_loss(logits, self.y_pl, end_points)
         self.grad_loss_wrt_x = tf.gradients(loss, self.x_pl)[0]
 
+        self.grad_out_wrt_x = []
+
+        for i in range(40):
+            self.grad_out_wrt_x.append(tf.gradients(logits[:, i], self.x_pl)[0])
+
         # load saved parameters
         saver = tf.train.Saver()
         config = tf.ConfigProto()
@@ -36,3 +41,11 @@ class PointNetInterface:
 
     def grad_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0]
+
+    def output_grad_fn(self, x):
+        res = []
+
+        for i in range(len(self.grad_out_wrt_x)):
+            res.append(self.sess.run(self.grad_out_wrt_x[i], feed_dict = {self.x_pl: [x], self.is_training: False})[0])
+
+        return np.array(res)

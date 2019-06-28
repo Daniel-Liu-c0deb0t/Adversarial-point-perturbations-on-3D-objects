@@ -1,6 +1,6 @@
 import numpy as np
 
-def remove_outliers_defense(x, params):
+def remove_outliers_defense(model, x, params):
     top_k = params["top_k"]
     num_std = params["num_std"]
 
@@ -16,6 +16,21 @@ def remove_outliers_defense(x, params):
 
     remove = dists > avg + std
     idx = np.argmin(remove)
+    x[remove] = x[idx]
+
+    return x
+
+def remove_salient_defense(model, x, params):
+    top_k = params["top_k"]
+
+    grads = model.output_grad_fn(x)
+    norms = np.linalg.norm(grads, axis = 2)
+    norms = np.max(grads, axis = 0)
+    remove = np.argsort(norms)[-top_k:]
+
+    mask = np.zeros(len(x))
+    mask[remove] = 1.0
+    idx = np.argmin(mask)
     x[remove] = x[idx]
 
     return x
