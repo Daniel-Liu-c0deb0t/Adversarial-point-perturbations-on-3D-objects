@@ -1,7 +1,7 @@
 import numpy as np
 from perturb_proj_tree import PerturbProjTree
 from alpha_shape import alpha_shape_border
-from sampling import farthest_point_sampling
+from sampling import farthest_point_sampling, radial_basis_sampling
 
 def iter_l2_attack_n_proj(model, x, y, params):
     epsilon = params["epsilon"]

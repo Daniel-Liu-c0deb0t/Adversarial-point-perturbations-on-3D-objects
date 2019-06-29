@@ -27,7 +27,7 @@ attacks = (
         ("mom_l2_attack_n_proj", adversarial_attacks.mom_l2_attack_n_proj, {"epsilon": 1.0, "mu": 1.0, "n": 10, "tau": 0.05}),
         ("iter_l2_attack_1_sampling", adversarial_attacks.iter_l2_attack_1_sampling, {"epsilon": 1.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": False}),
         ("iter_l2_attack_1_sampling_all", adversarial_attacks.iter_l2_attack_1_sampling_all, {"epsilon": 1.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": False}),
-        ("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 1.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": False})
+        ("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 1.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": False}),
         ("iter_l2_attack_1_sampling_rbf", adversarial_attacks.iter_l2_attack_1_sampling_rbf, {"epsilon": 1.0, "n": 10, "k": 700, "kappa": 10, "num_farthest": 100, "shape": 20.0})
 )
 
