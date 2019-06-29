@@ -63,8 +63,7 @@ def sample_points(triangles, num_points):
     return points
 
 @jit(nopython = True)
-def farthest_point_sampling(triangles, initial_points, num_points, kappa):
-    sampled_points = sample_points(triangles, kappa * num_points)
+def farthest_point(sampled_points, initial_points, num_points):
     curr_points = np.empty((num_points, 3))
     dists = np.full(len(sampled_points), np.inf)
 
@@ -83,3 +82,49 @@ def farthest_point_sampling(triangles, initial_points, num_points, kappa):
         dists = np.minimum(dists, norm(sampled_points - curr_points[i].reshape((1, -1))))
 
     return curr_points
+
+@jit(nopython = True)
+def farthest_point_sampling(triangles, initial_points, num_points, kappa):
+    sampled_points = sample_points(triangles, kappa * num_points)
+    return farthest_point(sampled_points, initial_points, num_points)
+
+@jit(nopython = True)
+def gaussian_rbf(norm, shape):
+    return np.exp(-((shape * norm) ** 2))
+
+@jit(nopython = True)
+def radial_basis(sampled_points, initial_points, num_points, shape):
+    prefix = []
+    curr_points = np.empty((num_points, 3))
+
+    for i in range(len(sampled_points)):
+        prob = np.inf
+
+        for j in range(len(initial_points)):
+            prob = min(prob, gaussian_rbf(np.linalg.norm(sampled_points[i] - initial_points[j]), shape))
+
+        if i == 0:
+            prefix.append(prob)
+        else:
+            prefix.append(prefix[i - 1] + prob)
+
+    total_prob = prefix[-1]
+
+    for i in range(num_points):
+        rand = np.random.uniform(0.0, total_prob)
+        idx = binary_search(prefix, rand)
+        curr_points[i] = sampled_points[idx]
+
+    return curr_points
+
+@jit(nopython = True)
+def radial_basis_sampling(triangles, initial_points, num_points, kappa, num_farthest, shape):
+    if num_farthest is None:
+        sampled_points = sample_points(triangles, kappa * num_points)
+        radial_basis_points = radial_basis(sampled_points, initial_points, kappa // 2 * num_points, shape)
+        return farthest_point(radial_basis_points, None, num_points)
+    else:
+        sampled_points = sample_points(triangles, kappa * num_points)
+        radial_basis_points = radial_basis(sampled_points, initial_points, num_points - num_farthest, shape)
+        initial_points = np.concatenate((initial_points, radial_basis_points))
+        return np.concatenate((farthest_point(sampled_points, initial_points, num_farthest), radial_basis_points))
