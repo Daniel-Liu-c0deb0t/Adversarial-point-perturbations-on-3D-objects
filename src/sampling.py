@@ -98,10 +98,10 @@ def radial_basis(sampled_points, initial_points, num_points, shape):
     curr_points = np.empty((num_points, 3))
 
     for i in range(len(sampled_points)):
-        prob = np.inf
+        prob = -np.inf
 
         for j in range(len(initial_points)):
-            prob = min(prob, gaussian_rbf(np.linalg.norm(sampled_points[i] - initial_points[j]), shape))
+            prob = max(prob, gaussian_rbf(np.linalg.norm(sampled_points[i] - initial_points[j]), shape))
 
         if i == 0:
             prefix.append(prob)
