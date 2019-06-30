@@ -93,7 +93,7 @@ for model_idx in test_models:
                 y_pred_idx = np.argmax(y_pred)
 
                 if y_pred_idx == y_idx: # model makes correct prediction
-                    x_adv = defense_fn(model, attack_fn(model, x, y_idx, attack_dict), defense_dict)
+                    x_adv = defense_fn(model, attack_fn(model, np.copy(x), y_idx, attack_dict), defense_dict)
                     y_adv_pred = model.pred_fn(x_adv)
                     y_adv_pred_idx = np.argmax(y_adv_pred)
 
