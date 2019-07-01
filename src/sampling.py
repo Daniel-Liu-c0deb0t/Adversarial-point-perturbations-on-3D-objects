@@ -94,7 +94,8 @@ def gaussian_rbf(norm, shape):
 
 @jit(nopython = True)
 def radial_basis(sampled_points, initial_points, num_points, shape):
-    prefix = []
+    probs = []
+    total_prob = 0.0
     curr_points = np.empty((num_points, 3))
 
     for i in range(len(sampled_points)):
@@ -103,17 +104,21 @@ def radial_basis(sampled_points, initial_points, num_points, shape):
         for j in range(len(initial_points)):
             prob = max(prob, gaussian_rbf(np.linalg.norm(sampled_points[i] - initial_points[j]), shape))
 
-        if i == 0:
-            prefix.append(prob)
-        else:
-            prefix.append(prefix[i - 1] + prob)
-
-    total_prob = prefix[-1]
+        probs.append(prob)
+        total_prob += prob
 
     for i in range(num_points):
         rand = np.random.uniform(0.0, total_prob)
-        idx = binary_search(prefix, rand)
-        curr_points[i] = sampled_points[idx]
+        sum_prob = 0.0
+
+        for j in range(len(sampled_points)):
+            sum_prob += probs[j]
+
+            if rand < sum_prob or j == len(sampled_points) - 1:
+                curr_points[i] = sampled_points[j]
+                total_prob -= probs[j]
+                probs[j] = 0.0
+                break
 
     return curr_points
 
