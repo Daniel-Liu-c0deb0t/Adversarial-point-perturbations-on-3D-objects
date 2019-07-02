@@ -249,3 +249,45 @@ def iter_l2_attack_1_sampling_rbf(model, x, y, params):
             x_sample[sort_idx[i]] = x_perturb[sort_idx[i]]
 
     return x_sample
+
+def iter_l2_attack_n_sampling_rbf(model, x, y, params):
+    epsilon = params["epsilon"]
+    n = params["n"]
+    k = params["k"]
+    kappa = params["kappa"]
+    num_farthest = params["num_farthest"]
+    shape = params["shape"]
+
+    epsilon = epsilon / float(n)
+    x_perturb = x
+
+    for i in range(n):
+        grad = model.grad_fn(x_perturb, y)
+        perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
+        x_perturb = x_perturb + perturb
+
+        sort_idx = np.argsort(np.linalg.norm(x_perturb - x, axis = 1))
+        perturbed = x_perturb[sort_idx[k:]]
+
+        border_points, border_triangles = alpha_shape_border(x_perturb)
+
+        triangles = []
+
+        for tri in border_triangles:
+            triangles.append(border_points[tri])
+
+        sampled = radial_basis_sampling(np.array(triangles), perturbed, k, kappa, num_farthest, shape)
+
+        idx = 0
+        x_sample = np.empty((len(x_perturb), 3))
+
+        for i in range(len(sort_idx)):
+            if i < k:
+                x_sample[sort_idx[i]] = sampled[idx]
+                idx += 1
+            else:
+                x_sample[sort_idx[i]] = x_perturb[sort_idx[i]]
+
+        x_perturb = x_sample
+
+    return x_perturb
