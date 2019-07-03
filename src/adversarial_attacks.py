@@ -291,3 +291,27 @@ def iter_l2_attack_n_sampling_rbf(model, x, y, params):
         x_perturb = x_sample
 
     return x_perturb
+
+def iter_l2_attack_top_k(model, x, y, params):
+    epsilon = params["epsilon"]
+    n = params["n"]
+    top_k = params["top_k"]
+
+    epsilon = epsilon / float(n)
+    x_perturb = x
+
+    for i in range(n):
+        grad = model.grad_fn(x_perturb, y)
+        perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
+        x_perturb = x_perturb + perturb
+
+    sort_idx = np.argsort(np.linalg.norm(x_perturb - x, axis = 1))
+    x_max = np.empty((len(x_perturb), 3))
+
+    for i in range(len(sort_idx)):
+        if i < len(sort_idx) - top_k:
+            x_max[sort_idx[i]] = x[sort_idx[i]]
+        else:
+            x_max[sort_idx[i]] = x_perturb[sort_idx[i]]
+
+    return x_max
