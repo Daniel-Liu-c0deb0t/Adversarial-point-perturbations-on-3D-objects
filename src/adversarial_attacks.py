@@ -1,7 +1,7 @@
 import numpy as np
 from perturb_proj_tree import PerturbProjTree
 from alpha_shape import alpha_shape_border
-from sampling import farthest_point_sampling, radial_basis_sampling
+from sampling import farthest_point_sampling, radial_basis_sampling, sample_on_line_segments
 
 def iter_l2_attack_n_proj(model, x, y, params):
     epsilon = params["epsilon"]
@@ -71,7 +71,7 @@ def iter_l2_attack_1_proj(model, x, y, params):
         perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
         x_perturb = x_perturb + perturb
 
-    x_perturb = tree.project(x_perturb, perturb)
+    x_perturb = tree.project(x_perturb, x_perturb - x)
 
     return x_perturb
 
@@ -128,13 +128,11 @@ def iter_l2_attack_1_sampling(model, x, y, params):
 
     sampled = farthest_point_sampling(np.array(triangles), perturbed, k, kappa)
 
-    idx = 0
     x_sample = np.empty((len(x_perturb), 3))
 
     for i in range(len(sort_idx)):
         if i < k:
-            x_sample[sort_idx[i]] = sampled[idx]
-            idx += 1
+            x_sample[sort_idx[i]] = sampled[i]
         else:
             x_sample[sort_idx[i]] = x_perturb[sort_idx[i]]
 
@@ -167,13 +165,11 @@ def iter_l2_attack_n_sampling(model, x, y, params):
 
         sampled = farthest_point_sampling(np.array(triangles), perturbed, k, kappa)
 
-        idx = 0
         x_sample = np.empty((len(x_perturb), 3))
 
         for i in range(len(sort_idx)):
             if i < k:
-                x_sample[sort_idx[i]] = sampled[idx]
-                idx += 1
+                x_sample[sort_idx[i]] = sampled[i]
             else:
                 x_sample[sort_idx[i]] = x_perturb[sort_idx[i]]
 
@@ -238,13 +234,11 @@ def iter_l2_attack_1_sampling_rbf(model, x, y, params):
 
     sampled = radial_basis_sampling(np.array(triangles), perturbed, k, kappa, num_farthest, shape)
 
-    idx = 0
     x_sample = np.empty((len(x_perturb), 3))
 
     for i in range(len(sort_idx)):
         if i < k:
-            x_sample[sort_idx[i]] = sampled[idx]
-            idx += 1
+            x_sample[sort_idx[i]] = sampled[i]
         else:
             x_sample[sort_idx[i]] = x_perturb[sort_idx[i]]
 
@@ -278,13 +272,11 @@ def iter_l2_attack_n_sampling_rbf(model, x, y, params):
 
         sampled = radial_basis_sampling(np.array(triangles), perturbed, k, kappa, num_farthest, shape)
 
-        idx = 0
         x_sample = np.empty((len(x_perturb), 3))
 
         for i in range(len(sort_idx)):
             if i < k:
-                x_sample[sort_idx[i]] = sampled[idx]
-                idx += 1
+                x_sample[sort_idx[i]] = sampled[i]
             else:
                 x_sample[sort_idx[i]] = x_perturb[sort_idx[i]]
 
@@ -310,6 +302,38 @@ def iter_l2_attack_top_k(model, x, y, params):
 
     for i in range(len(sort_idx)):
         if i < len(sort_idx) - top_k:
+            x_max[sort_idx[i]] = x[sort_idx[i]]
+        else:
+            x_max[sort_idx[i]] = x_perturb[sort_idx[i]]
+
+    return x_max
+
+def iter_l2_adversarial_sticks(model, x, y, params):
+    epsilon = params["epsilon"]
+    n = params["n"]
+    top_k = params["top_k"]
+    sigma = params["sigma"]
+
+    epsilon = epsilon / float(n)
+    tree = PerturbProjTree(x)
+    x_perturb = x
+
+    for i in range(n):
+        grad = model.grad_fn(x_perturb, y)
+        perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
+        x_perturb = x_perturb + perturb
+
+    sort_idx = np.argsort(np.linalg.norm(x_perturb - x, axis = 1))
+    perturbed_idx = sort_idx[-top_k:]
+    perturbed = x_perturb[perturbed_idx]
+    x_proj = tree.project(perturbed, perturbed - x[perturbed_idx])
+    x_sample = sample_on_line_segments(x_proj, perturbed, sigma)
+    x_max = np.empty((len(x_perturb), 3))
+
+    for i in range(len(sort_idx)):
+        if i < sigma:
+            x_max[sort_idx[i]] = x_sample[i]
+        elif i < len(sort_idx) - top_k:
             x_max[sort_idx[i]] = x[sort_idx[i]]
         else:
             x_max[sort_idx[i]] = x_perturb[sort_idx[i]]

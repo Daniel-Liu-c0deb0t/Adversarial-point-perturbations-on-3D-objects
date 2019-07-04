@@ -47,6 +47,7 @@ def _project(x_perturb, perturb, max_radius, thickness, root, center, radius_lo,
             # + maximum radius of all triangle circumcircles
             # + thickness of each triangle
             nearest_point, nearest_dist = _query(x_perturb[i], distances[i] + max_radius + thickness, root, thickness, center, radius_lo, radius_hi, inside_node, outside_node, triangle, is_leaf)
+
             if nearest_point is None:
                 x_proj.append(x_perturb[i] - perturb[i])
             else:

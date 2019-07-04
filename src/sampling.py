@@ -54,8 +54,8 @@ def sample_points(triangles, num_points):
         r2 = np.random.random()
 
         if r1 + r2 >= 1.0:
-            r1 = 1 - r1
-            r2 = 1 - r2
+            r1 = 1.0 - r1
+            r2 = 1.0 - r2
 
         point = a + r1 * (c - a) + r2 * (b - a)
         points[i] = point
@@ -133,3 +133,33 @@ def radial_basis_sampling(triangles, initial_points, num_points, kappa, num_fart
         radial_basis_points = radial_basis(sampled_points, initial_points, num_points - num_farthest, shape)
         initial_points = np.concatenate((initial_points, radial_basis_points))
         return np.concatenate((farthest_point(sampled_points, initial_points, num_farthest), radial_basis_points))
+
+@jit(nopython = True)
+def sample_on_line_segments(x, x_perturb, sigma):
+    small_perturb = 0.01
+    norms = norm(x_perturb - x)
+    prefix = []
+
+    for i in range(len(norms)):
+        if i == 0:
+            prefix.append(norms[i])
+        else:
+            prefix.append(prefix[i - 1] + norms[i])
+
+    total_prob = prefix[-1]
+    count = np.zeros(len(norms))
+
+    for i in range(sigma):
+        rand = np.random.uniform(0.0, total_prob)
+        idx = binary_search(prefix, rand)
+        count[idx] += 1.0
+
+    x_sample = np.empty((sigma, 3))
+    idx = 0
+
+    for i in range(len(norms)):
+        for j in range(count[i]):
+            x_sample[idx] = (x_perturb[i] - x[i]) * j / count[i] + small_perturb * np.random.randn(3)
+            idx += 1
+
+    return x_sample
