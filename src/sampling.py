@@ -159,7 +159,7 @@ def sample_on_line_segments(x, x_perturb, sigma):
 
     for i in range(len(norms)):
         for j in range(count[i]):
-            x_sample[idx] = (x_perturb[i] - x[i]) * j / count[i] + small_perturb * np.random.randn(3)
+            x_sample[idx] = x[i] + (x_perturb[i] - x[i]) * j / count[i] + small_perturb * np.random.randn(3)
             idx += 1
 
     return x_sample

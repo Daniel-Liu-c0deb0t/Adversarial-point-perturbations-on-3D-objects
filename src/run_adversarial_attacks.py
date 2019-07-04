@@ -34,7 +34,7 @@ attacks = (
         ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 3.0, "n": 10, "top_k": 10, "sigma": 200})
 )
 
-test_attacks = (12,)
+test_attacks = (13,)
 
 defenses = (
         ("none", lambda _a, x, _b: x, {}),
