@@ -33,7 +33,7 @@ def mom_l2_attack_n_proj(model, x, y, params):
 
     for i in range(n):
         curr_grad = model.grad_fn(x_perturb, y)
-        grad = mu * grad + curr_grad / np.sqrt(np.sum(curr_grad ** 2))
+        grad = mu * grad + curr_grad / np.mean(np.abs(curr_grad))
         perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
         x_perturb = x_perturb + perturb
         x_perturb = tree.project(x_perturb, perturb)
@@ -51,7 +51,7 @@ def mom_l2_attack(model, x, y, params):
 
     for i in range(n):
         curr_grad = model.grad_fn(x_perturb, y)
-        grad = mu * grad + curr_grad / np.sqrt(np.sum(curr_grad ** 2))
+        grad = mu * grad + curr_grad / np.mean(np.abs(curr_grad))
         perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
         x_perturb = x_perturb + perturb
 
