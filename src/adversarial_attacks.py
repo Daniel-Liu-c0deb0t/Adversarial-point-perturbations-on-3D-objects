@@ -339,3 +339,17 @@ def iter_l2_adversarial_sticks(model, x, y, params):
             x_max[sort_idx[i]] = x_perturb[sort_idx[i]]
 
     return x_max
+
+def iter_l2_attack_fft(model, x, y, params):
+    epsilon = params["epsilon"]
+    n = params["n"]
+
+    epsilon = epsilon / float(n)
+    x_perturb = np.fft.fft2(x)
+
+    for i in range(n):
+        grad = model.grad_freq_fn(x_perturb, y)
+        perturb = epsilon * grad / np.sqrt(np.sum(grad * np.conj(grad)))
+        x_perturb = x_perturb + perturb
+
+    return np.real(np.fft.ifft2(x_perturb))

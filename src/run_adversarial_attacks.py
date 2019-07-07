@@ -31,10 +31,11 @@ attacks = (
         ("iter_l2_attack_1_sampling_rbf", adversarial_attacks.iter_l2_attack_1_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_n_sampling_rbf", adversarial_attacks.iter_l2_attack_n_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_top_k", adversarial_attacks.iter_l2_attack_top_k, {"epsilon": 3.0, "n": 10, "top_k": 10}),
-        ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 3.0, "n": 10, "top_k": 10, "sigma": 200})
+        ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 3.0, "n": 10, "top_k": 10, "sigma": 200}),
+        ("iter_l2_attack_fft", adversarial_attacks.iter_l2_attack_fft, {"epsilon": 1.0, "n": 10})
 )
 
-test_attacks = (13,)
+test_attacks = (14,)
 
 defenses = (
         ("none", lambda _a, x, _b: x, {}),
