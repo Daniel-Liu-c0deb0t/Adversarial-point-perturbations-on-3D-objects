@@ -4,7 +4,7 @@ import importlib
 import sys
 
 class PointNet2Interface:
-    def __init__(self, max_points):
+    def __init__(self, max_points, fft = False, sink = False):
         checkpoint_path = "pointnet2/log/model.ckpt"
 
         sys.path.append("pointnet2/models")
