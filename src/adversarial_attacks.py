@@ -365,7 +365,9 @@ def iter_l2_attack_sinks(model, x, y, params):
     sink_coeff = np.zeros(num_sinks)
 
     for i in range(n):
-        grad = model.grad_sink_fn(x, y, sinks, sink_coeff, epsilon)
-        sink_coeff = sink_coeff + nu * grad
+        grad_coeff = model.grad_sink_coeff_fn(x, y, sinks, sink_coeff, epsilon)
+        grad_sink = model.grad_sink_fn(x, y, sinks, sink_coeff, epsilon)
+        sink_coeff = sink_coeff + nu * grad_coeff
+        sinks = sinks + nu * grad_sink
 
     return model.x_perturb_sink_fn(x, sinks, sink_coeff, epsilon)
