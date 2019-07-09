@@ -40,6 +40,7 @@ class PointNetInterface:
             self.sinks = tf.placeholder(tf.float32, shape = (1, None, 3))
             self.sink_coeff = tf.placeholder(tf.float32, shape = (1, None))
             self.epsilon = tf.placeholder(tf.float32, shape = ())
+            self.lambda_ = tf.placeholder(tf.float32, shape = ())
 
             x_to_sinks = self.sinks[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :]
             dist = tf.linalg.norm(x_to_sinks, axis = 3)
@@ -53,8 +54,8 @@ class PointNetInterface:
                 logits, end_points = model.get_model(self.x_perturb, self.is_training)
 
             loss = model.get_loss(logits, self.y_pl, end_points)
-            self.grad_loss_wrt_sink_coeff = tf.gradients(loss, self.sink_coeff)[0]
-            self.grad_loss_wrt_sinks = tf.gradients(loss, self.sinks)[0]
+            loss_dist = tf.sqrt(tf.reduce_sum((self.x_perturb - self.x_clean) ** 2, axis = (1, 2), keepdims = True))
+            self.grad_loss_wrt_sink_coeff = tf.gradients(loss - self.lambda_ * loss_dist, self.sink_coeff)[0]
 
         # load saved parameters
         saver = tf.train.Saver()
@@ -70,8 +71,8 @@ class PointNetInterface:
     def pred_fn(self, x):
         return self.sess.run(self.y_pred, feed_dict = {self.x_pl: [x], self.is_training: False})[0]
 
-    def x_perturb_sink_fn(self, x, sinks, sink_coeff, epsilon):
-        return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sinks: [sinks], self.sink_coeff: [sink_coeff], self.epsilon: epsilon, self.is_training: False})[0]
+    def x_perturb_sink_fn(self, x, sinks, sink_coeff, epsilon, lambda_):
+        return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sinks: [sinks], self.sink_coeff: [sink_coeff], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0]
 
     def grad_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0]
@@ -79,11 +80,8 @@ class PointNetInterface:
     def grad_freq_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x_freq, feed_dict = {self.x_freq: [x], self.y_pl: [y], self.is_training: False})[0]
 
-    def grad_sink_coeff_fn(self, x, y, sinks, sink_coeff, epsilon):
-        return self.sess.run(self.grad_loss_wrt_sink_coeff, feed_dict = {self.x_clean: [x], self.y_pl: [y], self.sinks: [sinks], self.sink_coeff: [sink_coeff], self.epsilon: epsilon, self.is_training: False})[0]
-
-    def grad_sink_fn(self, x, y, sinks, sink_coeff, epsilon):
-        return self.sess.run(self.grad_loss_wrt_sinks, feed_dict = {self.x_clean: [x], self.y_pl: [y], self.sinks: [sinks], self.sink_coeff: [sink_coeff], self.epsilon: epsilon, self.is_training: False})[0]
+    def grad_sink_coeff_fn(self, x, y, sinks, sink_coeff, epsilon, lambda_):
+        return self.sess.run(self.grad_loss_wrt_sink_coeff, feed_dict = {self.x_clean: [x], self.y_pl: [y], self.sinks: [sinks], self.sink_coeff: [sink_coeff], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0]
 
     def output_grad_fn(self, x):
         res = []
