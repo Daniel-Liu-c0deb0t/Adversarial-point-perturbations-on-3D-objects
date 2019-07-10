@@ -355,7 +355,7 @@ def iter_l2_attack_fft(model, x, y, params):
     return np.real(np.fft.ifft2(x_perturb))
 
 def iter_l2_attack_sinks(model, x, y, params):
-    nu = params["nu"]
+    eta = params["eta"]
     epsilon_rbf = params["epsilon_rbf"]
     epsilon = params["epsilon"]
     lambda_ = params["lambda_"]
@@ -372,10 +372,10 @@ def iter_l2_attack_sinks(model, x, y, params):
 
     perturbed_idx = np.argsort(np.linalg.norm(x_perturb - x, axis = 1))
     sinks = x_perturb[perturbed_idx[-num_sinks:]]
-    sink_coeff = np.zeros(num_sinks)
+    sink_sources = x[perturbed_idx[-num_sinks:]]
 
     for i in range(n):
-        grad_coeff = model.grad_sink_coeff_fn(x, y, sinks, sink_coeff, epsilon_rbf, lambda_)
-        sink_coeff = sink_coeff + nu * grad_coeff
+        grad = model.grad_sink_fn(x, y, sinks, sink_sources, epsilon_rbf, lambda_)
+        sinks = sinks + eta * grad
 
-    return model.x_perturb_sink_fn(x, sinks, sink_coeff, epsilon_rbf, lambda_)
+    return model.x_perturb_sink_fn(x, sinks, sink_sources, epsilon_rbf, lambda_)
