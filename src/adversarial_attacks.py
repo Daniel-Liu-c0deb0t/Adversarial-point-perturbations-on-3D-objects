@@ -371,11 +371,10 @@ def iter_l2_attack_sinks(model, x, y, params):
         x_perturb = x_perturb + perturb
 
     perturbed_idx = np.argsort(np.linalg.norm(x_perturb - x, axis = 1))
-    sinks = x_perturb[perturbed_idx[-num_sinks:]]
+    model.reset_sink_fn(x_perturb[perturbed_idx[-num_sinks:]])
     sink_sources = x[perturbed_idx[-num_sinks:]]
 
     for i in range(n):
-        grad = model.grad_sink_fn(x, y, sinks, sink_sources, epsilon_rbf, lambda_)
-        sinks = sinks + eta * grad
+        model.train_sink_fn(x, y, sink_sources, epsilon_rbf, lambda_, eta)
 
-    return model.x_perturb_sink_fn(x, sinks, sink_sources, epsilon_rbf, lambda_)
+    return model.x_perturb_sink_fn(x, sink_sources, epsilon_rbf, lambda_)

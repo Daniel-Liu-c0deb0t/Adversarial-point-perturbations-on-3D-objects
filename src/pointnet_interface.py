@@ -37,14 +37,18 @@ class PointNetInterface:
 
         if sink:
             self.x_clean = tf.placeholder(tf.float32, shape = self.x_pl.shape.as_list())
-            self.sinks = tf.placeholder(tf.float32, shape = (1, None, 3))
+            self.init_sink_pl = tf.placeholder(tf.float32, shape = (1, None, 3))
             self.sink_sources = tf.placeholder(tf.float32, shape = (1, None, 3))
             self.epsilon = tf.placeholder(tf.float32, shape = ())
             self.lambda_ = tf.placeholder(tf.float32, shape = ())
+            self.eta = tf.placeholder(tf.float32, shape = ())
+
+            sinks = tf.get_variable("sinks", dtype = tf.float32, shape = (1, None, 3))
+            self.init_sinks = tf.assign(sinks, self.init_sink_pl)
 
             dist = tf.linalg.norm(self.sink_sources[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :], axis = 3)
             rbf = tf.exp(-((dist / self.epsilon) ** 2))[:, :, :, tf.newaxis]
-            perturb = rbf * (self.sinks[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :])
+            perturb = rbf * (sinks[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :])
             perturb = tf.where(tf.is_finite(perturb), perturb, tf.zeros_like(perturb))
             self.x_perturb = self.x_clean + tf.reduce_sum(perturb, axis = 1)
 
@@ -53,7 +57,9 @@ class PointNetInterface:
 
             loss = model.get_loss(logits, self.y_pl, end_points)
             loss_dist = tf.sqrt(tf.reduce_sum((self.x_perturb - self.x_clean) ** 2, axis = (1, 2), keepdims = True))
-            self.grad_loss_wrt_sinks = tf.gradients(loss - self.lambda_ * loss_dist, self.sinks)[0]
+            optimizer = tf.train.AdamOptimizer(learning_rate = self.eta)
+            self.train = optimizer.minimize(-loss + self.lambda_ * loss_dist, var_list = [sinks])
+            self.init_optimizer = tf.initialize_variables(optimizer.variables())
 
         # load saved parameters
         saver = tf.train.Saver()
@@ -69,8 +75,12 @@ class PointNetInterface:
     def pred_fn(self, x):
         return self.sess.run(self.y_pred, feed_dict = {self.x_pl: [x], self.is_training: False})[0]
 
-    def x_perturb_sink_fn(self, x, sinks, sink_sources, epsilon, lambda_):
-        return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sinks: [sinks], self.sink_sources: [sink_sources], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0]
+    def reset_sink_fn(self, sinks):
+        self.sess.run(self.init_optimizer)
+        self.sess.run(self.init_sinks, feed_dict = {self.init_sink_pl: sinks})
+
+    def x_perturb_sink_fn(self, x, sink_sources, epsilon, lambda_):
+        return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sink_sources: [sink_sources], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0]
 
     def grad_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0]
@@ -78,8 +88,8 @@ class PointNetInterface:
     def grad_freq_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x_freq, feed_dict = {self.x_freq: [x], self.y_pl: [y], self.is_training: False})[0]
 
-    def grad_sink_fn(self, x, y, sinks, sink_sources, epsilon, lambda_):
-        return self.sess.run(self.grad_loss_wrt_sinks, feed_dict = {self.x_clean: [x], self.y_pl: [y], self.sinks: [sinks], self.sink_sources: [sink_sources], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0]
+    def train_sink_fn(self, x, y, sink_sources, epsilon, lambda_, eta):
+        return self.sess.run(self.train, feed_dict = {self.x_clean: [x], self.y_pl: [y], self.sink_sources: [sink_sources], self.epsilon: epsilon, self.lambda_: lambda_, self.eta: eta, self.is_training: False})[0]
 
     def output_grad_fn(self, x):
         res = []
