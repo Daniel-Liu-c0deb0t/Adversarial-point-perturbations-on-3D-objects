@@ -362,10 +362,10 @@ def iter_l2_attack_sinks(model, x, y, params):
     n = params["n"]
     num_sinks = params["num_sinks"]
 
-    epsilon = epsilon / float(n)
+    epsilon = epsilon / 10.0
     x_perturb = x
 
-    for i in range(n):
+    for i in range(10):
         grad = model.grad_fn(x_perturb, y)
         perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
         x_perturb = x_perturb + perturb

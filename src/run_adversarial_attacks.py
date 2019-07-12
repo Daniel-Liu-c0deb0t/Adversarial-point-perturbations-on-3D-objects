@@ -37,7 +37,7 @@ attacks = (
 )
 
 fft = False
-sink = True
+sink = 10
 
 test_attacks = (15,)
 
