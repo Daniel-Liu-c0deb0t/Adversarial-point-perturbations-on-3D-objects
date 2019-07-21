@@ -33,14 +33,50 @@ class PointNet2Interface:
         saver.restore(self.sess, checkpoint_path)
         print("Model restored!")
 
+        if sink is not None:
+            self.x_clean = tf.placeholder(tf.float32, shape = self.x_pl.shape.as_list())
+            self.init_sink_pl = tf.placeholder(tf.float32, shape = (1, sink, 3))
+            self.epsilon = tf.placeholder(tf.float32, shape = ())
+            self.lambda_ = tf.placeholder(tf.float32, shape = ())
+            self.eta = tf.placeholder(tf.float32, shape = ())
+
+            sinks = tf.get_variable("sinks", dtype = tf.float32, shape = (1, sink, 3))
+            self.init_sinks = tf.assign(sinks, self.init_sink_pl)
+
+            x_to_sinks = sinks[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :]
+            dist = tf.linalg.norm(x_to_sinks, axis = 3)
+            rbf = tf.exp(-((dist / self.epsilon) ** 2))[:, :, :, tf.newaxis]
+            perturb = rbf * x_to_sinks
+            perturb = tf.where(tf.is_finite(perturb), perturb, tf.zeros_like(perturb))
+            self.x_perturb = self.x_clean + tf.reduce_sum(perturb, axis = 1)
+
+            with tf.variable_scope(tf.get_variable_scope(), reuse = tf.AUTO_REUSE):
+                logits, end_points = model.get_model(self.x_perturb, self.is_training)
+
+            loss = model.get_loss(logits, self.y_pl, end_points)
+            loss_dist = tf.sqrt(tf.reduce_sum((self.x_perturb - self.x_clean) ** 2, axis = (1, 2), keepdims = True))
+            optimizer = tf.train.AdamOptimizer(learning_rate = self.eta)
+            self.train = optimizer.minimize(-loss + self.lambda_ * loss_dist, var_list = [sinks])
+            self.init_optimizer = tf.variables_initializer(optimizer.variables())
+
     def clean_up(self):
         self.sess.close()
 
     def pred_fn(self, x):
         return self.sess.run(self.y_pred, feed_dict = {self.x_pl: [x], self.is_training: False})[0]
 
+    def reset_sink_fn(self, sinks):
+        self.sess.run(self.init_optimizer)
+        self.sess.run(self.init_sinks, feed_dict = {self.init_sink_pl: [sinks]})
+
+    def x_perturb_sink_fn(self, x, epsilon, lambda_):
+        return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0]
+
     def grad_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0]
+
+    def train_sink_fn(self, x, y, epsilon, lambda_, eta):
+        self.sess.run(self.train, feed_dict = {self.x_clean: [x], self.y_pl: [y], self.epsilon: epsilon, self.lambda_: lambda_, self.eta: eta, self.is_training: False})
 
     def output_grad_fn(self, x):
         res = []

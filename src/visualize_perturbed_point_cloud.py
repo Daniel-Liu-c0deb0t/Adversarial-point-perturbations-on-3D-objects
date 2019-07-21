@@ -9,7 +9,7 @@ np.random.seed(1234)
 
 view_label = "chair"
 offset_idx = 0
-f = np.load("../output_save/1562875158_pointnet_iter_l2_attack_sinks_none.npz")
+f = np.load("../output_save/1563695777_pointnet_iter_l2_attack_sinks_none.npz")
 shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
 
 x = f["x"]
@@ -18,6 +18,7 @@ y_pred_idx = np.argmax(y_pred, axis = 1)
 x_adv = f["x_adv"]
 y_adv_pred = f["y_adv_pred"]
 y_adv_pred_idx = np.argmax(y_adv_pred, axis = 1)
+grad_adv = f["grad_adv"]
 
 print("Shape:", x.shape)
 print("Labels:", [shape_names[idx] for idx in np.unique(y_pred_idx)])
@@ -33,6 +34,7 @@ x_view = x[match_idx[offset_idx]]
 y_pred_idx_view = y_pred_idx[match_idx[offset_idx]]
 x_adv_view = x_adv[match_idx[offset_idx]]
 y_adv_pred_idx_view = y_adv_pred_idx[match_idx[offset_idx]]
+grad_adv_view = grad_adv[match_idx[offset_idx]]
 
 print("Attack result label:", shape_names[y_adv_pred_idx_view])
 print("Clean prediction confidence:", y_pred[match_idx[offset_idx]][y_pred_idx_view])
@@ -54,7 +56,11 @@ scale_plot()
 
 plt.subplot(122, projection = "3d")
 
-plt.gca().scatter(*x_adv_view.T, zdir = "y", s = 20, c = x_adv_view.T[1], cmap = "winter")
+grad_adv_view = np.linalg.norm(grad_adv_view, axis = 1)
+close_to_zero = np.isclose(grad_adv_view, 0.0)
+point_color = np.logical_not(close_to_zero).astype(float)
+
+plt.gca().scatter(*x_adv_view.T, zdir = "y", s = 20, c = point_color, cmap = "winter")
 
 scale_plot()
 

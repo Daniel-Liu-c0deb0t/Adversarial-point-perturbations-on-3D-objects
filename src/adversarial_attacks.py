@@ -356,25 +356,15 @@ def iter_l2_attack_fft(model, x, y, params):
 
 def iter_l2_attack_sinks(model, x, y, params):
     eta = params["eta"]
-    epsilon_rbf = params["epsilon_rbf"]
-    epsilon = params["epsilon"]
+    mu = params["mu"]
     lambda_ = params["lambda_"]
     n = params["n"]
     num_sinks = params["num_sinks"]
 
-    epsilon = epsilon / 10.0
-    x_perturb = x
-
-    for i in range(10):
-        grad = model.grad_fn(x_perturb, y)
-        perturb = epsilon * grad / np.sqrt(np.sum(grad ** 2))
-        x_perturb = x_perturb + perturb
-
-    perturbed_idx = np.argsort(np.linalg.norm(x_perturb - x, axis = 1))
-    model.reset_sink_fn(x_perturb[perturbed_idx[-num_sinks:]])
-    sink_sources = x[perturbed_idx[-num_sinks:]]
+    perturbed_idx = np.argsort(np.linalg.norm(model.grad_fn(x, y), axis = 1))
+    model.reset_sink_fn(x[perturbed_idx[-num_sinks:]])
 
     for i in range(n):
-        model.train_sink_fn(x, y, sink_sources, epsilon_rbf, lambda_, eta)
+        model.train_sink_fn(x, y, mu, lambda_, eta)
 
-    return model.x_perturb_sink_fn(x, sink_sources, epsilon_rbf, lambda_)
+    return model.x_perturb_sink_fn(x, mu, lambda_)

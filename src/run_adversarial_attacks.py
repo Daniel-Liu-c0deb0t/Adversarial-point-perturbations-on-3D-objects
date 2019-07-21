@@ -31,13 +31,13 @@ attacks = (
         ("iter_l2_attack_1_sampling_rbf", adversarial_attacks.iter_l2_attack_1_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_n_sampling_rbf", adversarial_attacks.iter_l2_attack_n_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_top_k", adversarial_attacks.iter_l2_attack_top_k, {"epsilon": 3.0, "n": 10, "top_k": 10}),
-        ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 3.0, "n": 10, "top_k": 10, "sigma": 200}),
+        ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 10, "top_k": 10, "sigma": 150}),
         ("iter_l2_attack_fft", adversarial_attacks.iter_l2_attack_fft, {"epsilon": 20.0, "n": 10}),
-        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.001, "epsilon": 2.0, "epsilon_rbf": 0.1, "lambda_": 5.0, "n": 100, "num_sinks": 10})
+        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 0.2, "lambda_": 25.0, "n": 100, "num_sinks": 50})
 )
 
 fft = False
-sink = 10
+sink = 50
 
 test_attacks = (15,)
 
@@ -103,6 +103,7 @@ for model_idx in test_models:
                 if y_pred_idx == y_idx: # model makes correct prediction
                     x_adv = defense_fn(model, attack_fn(model, np.copy(x), y_idx, attack_dict), defense_dict)
                     y_adv_pred = model.pred_fn(x_adv)
+                    grad_adv = model.grad_fn(x_adv, y_idx)
                     y_adv_pred_idx = np.argmax(y_adv_pred)
 
                     if y_adv_pred_idx != y_idx:
@@ -110,13 +111,13 @@ for model_idx in test_models:
 
                     total_attacked += 1
 
-                    all_attacked.append((x, y_pred, x_adv, y_adv_pred, t))
+                    all_attacked.append((x, y_pred, x_adv, y_adv_pred, t, grad_adv))
 
             all_attacked = list(zip(*all_attacked))
             all_attacked = [np.array(a) for a in all_attacked]
             timestamp = int(time.time())
             save_file = "%s/%d_%s_%s_%s.npz" % (output_dir, timestamp, model_name, attack_name, defense_name)
-            np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], t = all_attacked[4])
+            np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], t = all_attacked[4], grad_adv = all_attacked[5])
 
             print("Current time\t%d" % timestamp)
             print("Elapsed time\t%f" % (timestamp - attack_start_time))
