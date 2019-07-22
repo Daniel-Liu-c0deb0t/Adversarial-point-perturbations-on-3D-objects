@@ -1,8 +1,8 @@
 import numpy as np
 
 def remove_outliers_defense(model, x, params):
-    top_k = params["top_k"]
-    num_std = params["num_std"]
+    top_k = int(params["top_k"])
+    num_std = float(params["num_std"])
 
     dists = x[np.newaxis, :, :] - x[:, np.newaxis, :]
     dists = np.linalg.norm(dists, axis = 2)
@@ -21,7 +21,7 @@ def remove_outliers_defense(model, x, params):
     return x
 
 def remove_salient_defense(model, x, params):
-    top_k = params["top_k"]
+    top_k = int(params["top_k"])
 
     grads = model.output_grad_fn(x)
     norms = np.linalg.norm(grads, axis = 2)

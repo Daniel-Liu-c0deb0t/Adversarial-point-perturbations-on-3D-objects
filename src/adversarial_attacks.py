@@ -4,9 +4,9 @@ from alpha_shape import alpha_shape_border
 from sampling import farthest_point_sampling, radial_basis_sampling, sample_on_line_segments
 
 def iter_l2_attack_n_proj(model, x, y, params):
-    epsilon = params["epsilon"]
-    n = params["n"]
-    tau = params["tau"]
+    epsilon = float(params["epsilon"])
+    n = int(params["n"])
+    tau = float(params["tau"])
 
     epsilon = epsilon / float(n)
     tree = PerturbProjTree(x, thickness = tau)
@@ -76,8 +76,8 @@ def iter_l2_attack_1_proj(model, x, y, params):
     return x_perturb
 
 def iter_l2_attack(model, x, y, params):
-    epsilon = params["epsilon"]
-    n = params["n"]
+    epsilon = float(params["epsilon"])
+    n = int(params["n"])
 
     epsilon = epsilon / float(n)
     x_perturb = x
@@ -90,8 +90,8 @@ def iter_l2_attack(model, x, y, params):
     return x_perturb
 
 def normal_jitter(model, x, y, params):
-    epsilon = params["epsilon"]
-    tau = params["tau"]
+    epsilon = float(params["epsilon"])
+    tau = float(params["tau"])
 
     tree = PerturbProjTree(x, thickness = tau)
     perturb = np.random.normal(size = x.shape)
@@ -139,11 +139,11 @@ def iter_l2_attack_1_sampling(model, x, y, params):
     return x_sample
 
 def iter_l2_attack_n_sampling(model, x, y, params):
-    epsilon = params["epsilon"]
-    n = params["n"]
-    k = params["k"]
-    kappa = params["kappa"]
-    tri_all_points = params["tri_all_points"]
+    epsilon = float(params["epsilon"])
+    n = int(params["n"])
+    k = int(params["k"])
+    kappa = int(params["kappa"])
+    tri_all_points = bool(params["tri_all_points"])
 
     epsilon = epsilon / float(n)
     x_perturb = x
@@ -309,10 +309,10 @@ def iter_l2_attack_top_k(model, x, y, params):
     return x_max
 
 def iter_l2_adversarial_sticks(model, x, y, params):
-    epsilon = params["epsilon"]
-    n = params["n"]
-    top_k = params["top_k"]
-    sigma = params["sigma"]
+    epsilon = float(params["epsilon"])
+    n = int(params["n"])
+    top_k = int(params["top_k"])
+    sigma = int(params["sigma"])
 
     epsilon = epsilon / float(n)
     tree = PerturbProjTree(x)
@@ -355,11 +355,11 @@ def iter_l2_attack_fft(model, x, y, params):
     return np.real(np.fft.ifft2(x_perturb))
 
 def iter_l2_attack_sinks(model, x, y, params):
-    eta = params["eta"]
-    mu = params["mu"]
-    lambda_ = params["lambda_"]
-    n = params["n"]
-    num_sinks = params["num_sinks"]
+    eta = float(params["eta"])
+    mu = float(params["mu"])
+    lambda_ = float(params["lambda_"])
+    n = int(params["n"])
+    num_sinks = int(params["num_sinks"])
 
     perturbed_idx = np.argsort(np.linalg.norm(model.grad_fn(x, y), axis = 1))
     model.reset_sink_fn(x[perturbed_idx[-num_sinks:]])
