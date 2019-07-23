@@ -143,7 +143,7 @@ def iter_l2_attack_n_sampling(model, x, y, params):
     n = int(params["n"])
     k = int(params["k"])
     kappa = int(params["kappa"])
-    tri_all_points = bool(params["tri_all_points"])
+    tri_all_points = str(params["tri_all_points"]) == "True"
 
     epsilon = epsilon / float(n)
     x_perturb = x

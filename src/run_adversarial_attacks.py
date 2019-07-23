@@ -1,6 +1,7 @@
 import numpy as np
 import adversarial_attacks
 import adversarial_defenses
+from proj_true_shape import project_points_to_triangles
 from pointnet_interface import PointNetInterface
 from pointnet2_interface import PointNet2Interface
 import time
@@ -66,7 +67,7 @@ class_names = [line.rstrip() for line in open(class_names_path)]
 with np.load(input_data_path) as file:
     X = file["points"][:num_point_clouds, :max_points, :]
     Y = file["labels"][:num_point_clouds]
-    T = file["faces"][:num_point_clouds, :max_points, :3, :]
+    T = file["faces"][:num_point_clouds, :, :3, :]
 
 model_name = test_model
 model_type = models[test_model]
@@ -90,6 +91,7 @@ attack_start_time = time.time()
 successfully_attacked = 0
 total_attacked = 0
 all_attacked = []
+avg_dist = 0.0
 
 for idx in range(len(X)):
     x = X[idx]
@@ -104,6 +106,11 @@ for idx in range(len(X)):
         grad_adv = model.grad_fn(x_adv, y_idx)
         y_adv_pred_idx = np.argmax(y_adv_pred)
 
+        if defense_name == "none":
+            x_adv_proj = project_points_to_triangles(x_adv, t)
+            dist = np.max(np.linalg.norm(x_adv_proj - x_adv, axis = 1))
+            avg_dist += dist
+
         if y_adv_pred_idx != y_idx:
             successfully_attacked += 1
 
@@ -117,10 +124,16 @@ timestamp = int(time.time())
 save_file = "%s/%d_%s_%s_%s.npz" % (output_dir, timestamp, model_name, attack_name, defense_name)
 np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], t = all_attacked[4], grad_adv = all_attacked[5])
 
+avg_dist = avg_dist / float(len(X))
+
 print("Current time\t%d" % timestamp)
 print("Elapsed time\t%f" % (timestamp - attack_start_time))
 print("Number of attempted attacks\t%d" % total_attacked)
 print("Number of successful attacks\t%d" % successfully_attacked)
+
+if defense_name == "none":
+    print("Average Haussdorf distance\t%f" % avg_dist)
+
 print("Data saved in\t%s" % save_file)
 print()
 
