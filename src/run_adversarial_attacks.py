@@ -116,13 +116,13 @@ for idx in range(len(X)):
 
         total_attacked += 1
 
-        all_attacked.append((x, y_pred, x_adv, y_adv_pred, t, grad_adv))
+        all_attacked.append((x, y_pred, x_adv, y_adv_pred, grad_adv))
 
 all_attacked = list(zip(*all_attacked))
 all_attacked = [np.array(a) for a in all_attacked]
 timestamp = int(time.time())
 save_file = "%s/%d_%s_%s_%s.npz" % (output_dir, timestamp, model_name, attack_name, defense_name)
-np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], t = all_attacked[4], grad_adv = all_attacked[5])
+np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], grad_adv = all_attacked[4])
 
 avg_dist = avg_dist / float(len(X))
 
