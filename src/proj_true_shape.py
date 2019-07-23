@@ -10,7 +10,7 @@ def project_points_to_triangles(x, t):
 
     triangles = np.array(list(triangles))
 
-    return _project_points_to_triangles(x, triangles)
+    return _project_points_to_triangles(x.astype(float), triangles)
 
 @jit(nopython = True)
 def _project_points_to_triangles(x, t):
