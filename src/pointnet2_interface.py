@@ -69,7 +69,7 @@ class PointNet2Interface:
         self.sess.run(self.init_sinks, feed_dict = {self.init_sink_pl: [sinks]})
 
     def x_perturb_sink_fn(self, x, sink_source, epsilon, lambda_):
-        return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sink_source: [sink_source], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0]
+        return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sink_source: [sink_source], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0].astype(float)
 
     def grad_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0]

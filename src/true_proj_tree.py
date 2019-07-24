@@ -70,15 +70,10 @@ def _calc_tri_center(triangles):
 # each triangle is represented as a point in the tree
 class TrueProjTree:
     def __init__(self, t):
-        triangles = set()
-
-        for tri in t:
-            triangles.add(tuple(sorted([tuple(a) for a in tri])))
-
-        triangles = np.array(list(triangles))
-
-        tri_center, self.max_radius = _calc_tri_center(triangles)
+        tri_center, self.max_radius = _calc_tri_center(t)
         tri_center = np.vstack(tri_center)
+        tri_center, unique_idx = np.unique(tri_center, axis = 0, return_index = True)
+        triangles = t[unique_idx]
 
         self.center = np.empty((len(triangles) * 2, 3))
         self.radius_lo = np.empty(len(triangles) * 2)
