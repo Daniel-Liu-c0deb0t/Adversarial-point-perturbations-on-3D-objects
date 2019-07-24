@@ -1,7 +1,7 @@
 import numpy as np
 import adversarial_attacks
 import adversarial_defenses
-from true_proj_tree import TrueProjTree
+from true_proj import project_points_to_triangles
 from pointnet_interface import PointNetInterface
 from pointnet2_interface import PointNet2Interface
 import time
@@ -107,8 +107,7 @@ for idx in range(len(X)):
         y_adv_pred_idx = np.argmax(y_adv_pred)
 
         if defense_name == "none":
-            true_tree = TrueProjTree(t)
-            x_adv_proj = true_tree.project(x_adv, x_adv - x)
+            x_adv_proj = project_points_to_triangles(x_adv, t)
             dist = np.max(np.linalg.norm(x_adv_proj - x_adv, axis = 1))
             avg_dist += dist
 

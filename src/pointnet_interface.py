@@ -5,6 +5,8 @@ import sys
 
 class PointNetInterface:
     def __init__(self, max_points, fft = False, sink = None):
+        tf.reset_default_graph()
+
         checkpoint_path = "pointnet/log/model.ckpt"
 
         sys.path.append("pointnet/models")
@@ -72,7 +74,7 @@ class PointNetInterface:
         self.sess.close()
 
     def pred_fn(self, x):
-        return self.sess.run(self.y_pred, feed_dict = {self.x_pl: [x], self.is_training: False})[0]
+        return self.sess.run(self.y_pred, feed_dict = {self.x_pl: [x], self.is_training: False})[0].astype(float)
 
     def reset_sink_fn(self, sinks):
         self.sess.run(self.init_optimizer)
@@ -82,10 +84,10 @@ class PointNetInterface:
         return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sink_source: [sink_source], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0].astype(float)
 
     def grad_fn(self, x, y):
-        return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0]
+        return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0].astype(float)
 
     def grad_freq_fn(self, x, y):
-        return self.sess.run(self.grad_loss_wrt_x_freq, feed_dict = {self.x_freq: [x], self.y_pl: [y], self.is_training: False})[0]
+        return self.sess.run(self.grad_loss_wrt_x_freq, feed_dict = {self.x_freq: [x], self.y_pl: [y], self.is_training: False})[0].astype(float)
 
     def train_sink_fn(self, x, y, sink_source, epsilon, lambda_, eta):
         self.sess.run(self.train, feed_dict = {self.x_clean: [x], self.y_pl: [y], self.sink_source: [sink_source], self.epsilon: epsilon, self.lambda_: lambda_, self.eta: eta, self.is_training: False})
@@ -94,6 +96,6 @@ class PointNetInterface:
         res = []
 
         for i in range(len(self.grad_out_wrt_x)):
-            res.append(self.sess.run(self.grad_out_wrt_x[i], feed_dict = {self.x_pl: [x], self.is_training: False})[0])
+            res.append(self.sess.run(self.grad_out_wrt_x[i], feed_dict = {self.x_pl: [x], self.is_training: False})[0].astype(float))
 
         return np.array(res)
