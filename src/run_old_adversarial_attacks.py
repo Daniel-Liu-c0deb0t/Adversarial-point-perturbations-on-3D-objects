@@ -34,7 +34,7 @@ attacks = (
         ("iter_l2_attack_top_k", adversarial_attacks.iter_l2_attack_top_k, {"epsilon": 3.0, "n": 10, "top_k": 10}),
         ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 10, "top_k": 10, "sigma": 150}),
         ("iter_l2_attack_fft", adversarial_attacks.iter_l2_attack_fft, {"epsilon": 20.0, "n": 10}),
-        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 0.2, "lambda_": 25.0, "n": 100, "num_sinks": 50})
+        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 2.0, "lambda_": 25.0, "n": 100, "num_sinks": 50})
 )
 
 fft = False

@@ -361,6 +361,11 @@ def iter_l2_attack_sinks(model, x, y, params):
     n = int(params["n"])
     num_sinks = int(params["num_sinks"])
 
+    dists = np.linalg.norm(x[:, np.newaxis, :] - x[np.newaxis, :, :], axis = 2)
+    dists = np.where(np.eye(len(x)) > 0.0, np.full(dists.shape, np.inf), dists)
+    avg_min_dist = np.mean(np.min(dists, axis = 1))
+    mu = mu * avg_min_dist
+
     perturbed_idx = np.argsort(np.linalg.norm(model.grad_fn(x, y), axis = 1))
     model.reset_sink_fn(x[perturbed_idx[-num_sinks:]])
     sink_source = x[perturbed_idx[-num_sinks:]]
