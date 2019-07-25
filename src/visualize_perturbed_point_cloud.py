@@ -6,7 +6,7 @@ np.random.seed(1234)
 
 view_label = "airplane"
 offset_idx = 0
-f = np.load("../output_save/1564076214_pointnet_iter_l2_attack_sinks_none.npz")
+f = np.load("../output_save/1564087848_pointnet2_iter_l2_attack_sinks_none.npz")
 shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
 show_grads = True
 

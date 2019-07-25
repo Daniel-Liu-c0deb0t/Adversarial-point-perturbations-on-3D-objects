@@ -34,11 +34,11 @@ attacks = (
         ("iter_l2_attack_top_k", adversarial_attacks.iter_l2_attack_top_k, {"epsilon": 3.0, "n": 10, "top_k": 10}),
         ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 10, "top_k": 10, "sigma": 150}),
         ("iter_l2_attack_fft", adversarial_attacks.iter_l2_attack_fft, {"epsilon": 20.0, "n": 10}),
-        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 2.0, "lambda_": 25.0, "n": 100, "num_sinks": 50})
+        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 3.0, "lambda_": 40.0, "n": 100, "num_sinks": 100})
 )
 
 fft = False
-sink = 50
+sink = 100
 
 test_attacks = (15,)
 
@@ -78,6 +78,8 @@ for model_idx in test_models:
         attack_fn = attacks[attack_idx][1]
         attack_dict = attacks[attack_idx][2]
 
+        attack_cache = {}
+
         for defense_idx in test_defenses:
             defense_name = defenses[defense_idx][0]
             defense_fn = defenses[defense_idx][1]
@@ -103,7 +105,13 @@ for model_idx in test_models:
                 y_pred_idx = np.argmax(y_pred)
 
                 if y_pred_idx == y_idx: # model makes correct prediction
-                    x_adv = defense_fn(model, attack_fn(model, np.copy(x), y_idx, attack_dict), defense_dict)
+                    if idx in attack_cache:
+                        curr_x_adv = attack_cache[idx]
+                    else:
+                        curr_x_adv = attack_fn(model, np.copy(x), y_idx, attack_dict)
+                        attack_cache[idx] = curr_x_adv
+
+                    x_adv = defense_fn(model, np.copy(curr_x_adv), defense_dict)
                     y_adv_pred = model.pred_fn(x_adv)
                     grad_adv = model.grad_fn(x_adv, y_idx)
                     y_adv_pred_idx = np.argmax(y_adv_pred)
