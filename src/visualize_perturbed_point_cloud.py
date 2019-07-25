@@ -1,16 +1,14 @@
 import numpy as np
-import time
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from alpha_shape import alpha_shape_border
-from perturb_proj_tree import PerturbProjTree
 
 np.random.seed(1234)
 
-view_label = "bookshelf"
+view_label = "airplane"
 offset_idx = 0
-f = np.load("../output_save/1563965119_pointnet_iter_l2_attack_sinks_none.npz")
+f = np.load("../output_save/1564076214_pointnet_iter_l2_attack_sinks_none.npz")
 shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
+show_grads = True
 
 x = f["x"]
 y_pred = f["y_pred"]
@@ -56,13 +54,17 @@ scale_plot()
 
 plt.subplot(122, projection = "3d")
 
-grad_adv_view = np.linalg.norm(grad_adv_view, axis = 1)
-close_to_zero = np.isclose(grad_adv_view, 0.0)
-point_color = np.logical_not(close_to_zero).astype(float)
+if show_grads:
+    grad_adv_view = np.linalg.norm(grad_adv_view, axis = 1)
+    close_to_zero = np.isclose(grad_adv_view, 0.0)
+    point_color = np.logical_not(close_to_zero).astype(float)
 
-plt.gca().scatter(*x_adv_view.T, zdir = "y", s = 20, c = point_color, cmap = "winter")
+    plt.gca().scatter(*x_adv_view.T, zdir = "y", s = 20, c = point_color, cmap = "winter")
+else:
+    plt.gca().scatter(*x_adv_view.T, zdir = "y", s = 20, c = x_adv_view.T[1], cmap = "winter")
 
 scale_plot()
 
 plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1, wspace = 0, hspace = 0)
+plt.tight_layout()
 plt.show()
