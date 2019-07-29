@@ -31,7 +31,7 @@ for i, model in enumerate(models):
     idx = idx[offset_idx[i]]
     match_idx.append(idx)
 
-plt.figure(figsize = (20, 20))
+plt.figure(figsize = (24, 20))
 
 def scale_plot():
     scale = 0.7
@@ -46,12 +46,14 @@ for i, idx in enumerate(match_idx):
         scale_plot()
 
 for i in range(len(xlabels)):
-    plt.gcf().text(i / float(len(xlabels)) + 0.5 / len(xlabels), 0.97, xlabels[i], fontsize = 30, horizontalalignment = "center")
+    plt.gcf().text(i / (float(len(xlabels)) + 0.3) + 0.5 / len(xlabels) + 0.05, 0.93, xlabels[i], fontsize = 30, horizontalalignment = "center")
 
 for i in range(len(models)):
-    plt.gcf().text(0.01, i / float(len(models)) + 0.5 / len(models), models[-i - 1], fontsize = 30, rotation = "vertical", verticalalignment = "center")
+    plt.gcf().text(0.05, i / (float(len(models)) + 0.1) + 0.5 / len(models), models[-i - 1].capitalize(), fontsize = 30, rotation = "vertical", verticalalignment = "center")
 
-plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1, wspace = 0, hspace = 0)
-plt.tight_layout()
+plt.gcf().text(0.5, 0.96, "Attacks", fontsize = 40, horizontalalignment = "center")
+plt.gcf().text(0.01, 0.5, "Defenses", fontsize = 40, rotation = "vertical", verticalalignment = "center")
+
+plt.subplots_adjust(left = 0.05, bottom = 0, right = 1, top = 0.95, wspace = 0, hspace = 0)
 plt.savefig("../figures/object_attack.pdf", bbox_inches = "tight")
 plt.show()

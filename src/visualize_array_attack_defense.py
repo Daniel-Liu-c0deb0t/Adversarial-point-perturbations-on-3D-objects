@@ -66,12 +66,14 @@ for i, attack_files in enumerate(files):
         scale_plot()
 
 for i in range(len(xlabels)):
-    plt.gcf().text(i / float(len(xlabels)) + 0.5 / len(xlabels), 0.97, xlabels[i], fontsize = 30, horizontalalignment = "center")
+    plt.gcf().text(i / (float(len(xlabels)) + 0.3) + 0.5 / len(xlabels) + 0.05, 0.9, xlabels[i], fontsize = 30, horizontalalignment = "center")
 
 for i in range(len(ylabels)):
-    plt.gcf().text(0.01, i / float(len(ylabels)) + 0.5 / len(ylabels), ylabels[-i - 1], fontsize = 30, rotation = "vertical", verticalalignment = "center")
+    plt.gcf().text(0.05, i / (float(len(ylabels)) + 0.1) + 0.5 / len(ylabels), ylabels[-i - 1], fontsize = 30, rotation = "vertical", verticalalignment = "center")
 
-plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1, wspace = 0, hspace = 0)
-plt.tight_layout()
+plt.gcf().text(0.5, 0.96, "Attacks", fontsize = 40, horizontalalignment = "center")
+plt.gcf().text(0.01, 0.5, "Defenses", fontsize = 40, rotation = "vertical", verticalalignment = "center")
+
+plt.subplots_adjust(left = 0.05, bottom = 0, right = 1, top = 0.95, wspace = 0, hspace = 0)
 plt.savefig("../figures/attack_defense.pdf", bbox_inches = "tight")
 plt.show()
