@@ -5,30 +5,33 @@ from mpl_toolkits.mplot3d import Axes3D
 # defenses x attacks
 paths = [
     [
-        "",
-        "",
-        "",
-        "",
-        ""
+        "../output_save/final/1564113021_pointnet_none_none.npz",
+        "../output_save/final/1564130586_pointnet_iter_l2_attack_none.npz",
+        "../output_save/final/1564164544_pointnet_iter_l2_attack_n_proj_none.npz",
+        "../output_save/final/1564190398_pointnet_iter_l2_attack_n_sampling_none.npz",
+        "../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz",
+        "../output_save/final/1564228868_pointnet_iter_l2_attack_sinks_none.npz"
     ],
     [
-        "",
-        "",
-        "",
-        "",
-        ""
+        "../output_save/final/1564113228_pointnet_none_remove_outliers_defense.npz",
+        "../output_save/final/1564130794_pointnet_iter_l2_attack_remove_outliers_defense.npz",
+        "../output_save/final/1564164752_pointnet_iter_l2_attack_n_proj_remove_outliers_defense.npz",
+        "../output_save/final/1564190606_pointnet_iter_l2_attack_n_sampling_remove_outliers_defense.npz",
+        "../output_save/final/1564209144_pointnet_iter_l2_adversarial_sticks_remove_outliers_defense.npz",
+        "../output_save/final/1564229079_pointnet_iter_l2_attack_sinks_remove_outliers_defense.npz"
     ],
     [
-        "",
-        "",
-        "",
-        "",
-        ""
+        "../output_save/final/1564114212_pointnet_none_remove_salient_defense.npz",
+        "../output_save/final/1564131746_pointnet_iter_l2_attack_remove_salient_defense.npz",
+        "../output_save/final/1564165709_pointnet_iter_l2_attack_n_proj_remove_salient_defense.npz",
+        "../output_save/final/1564191563_pointnet_iter_l2_attack_n_sampling_remove_salient_defense.npz",
+        "../output_save/final/1564210100_pointnet_iter_l2_adversarial_sticks_remove_salient_defense.npz",
+        "../output_save/final/1564230037_pointnet_iter_l2_attack_sinks_remove_salient_defense.npz"
     ]
 ]
 
-xlabels = ["iter. gradient $L_2$", "distribution", "perturb. resample", "adv. sticks", "adv. sinks"]
-ylabels = ["no defense", "remove outliers", "remove salient"]
+xlabels = ["None", "Iter. gradient $L_2$", "Distribution", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
+ylabels = ["None", "Remove outliers", "Remove salient"]
 
 model = "airplane"
 offset_idx = 0
@@ -51,22 +54,22 @@ match_idx = match_idx[offset_idx]
 plt.figure(figsize = (30, 15))
 
 def scale_plot():
-    plt.gca().auto_scale_xyz((-1, 1), (-1, 1), (-1, 1))
-    plt.gca().view_init(0, 0)
+    scale = 0.7
+    plt.gca().auto_scale_xyz((-scale, scale), (-scale, scale), (-scale, scale))
+    plt.gca().view_init(30, 120)
     plt.axis("off")
 
 for i, attack_files in enumerate(files):
     for j, f in enumerate(attack_files):
-        plt.subplot(len(files), len(files[0]), i * len(files[0]) + j, projection = "3d")
-        plt.gca().scatter(*f["x_adv"][match_idx].T, zdir = "y", s = 20, c = f["x_adv"][match_idx].T[1], cmap = "winter")
-
-        if i == len(files) - 1:
-            plt.xlabel(xlabels[j])
-
-        if j == 0:
-            plt.ylabel(ylabels[i])
-
+        plt.subplot(len(files), len(files[0]), i * len(files[0]) + j + 1, projection = "3d")
+        plt.gca().scatter(*f["x_adv"][match_idx].T, zdir = "y", s = 5, c = f["x_adv"][match_idx].T[2], cmap = "winter")
         scale_plot()
+
+for i in range(len(xlabels)):
+    plt.gcf().text(i / float(len(xlabels)) + 0.5 / len(xlabels), 0.97, xlabels[i], fontsize = 30, horizontalalignment = "center")
+
+for i in range(len(ylabels)):
+    plt.gcf().text(0.01, i / float(len(ylabels)) + 0.5 / len(ylabels), ylabels[-i - 1], fontsize = 30, rotation = "vertical", verticalalignment = "center")
 
 plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1, wspace = 0, hspace = 0)
 plt.tight_layout()

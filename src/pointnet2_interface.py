@@ -49,7 +49,7 @@ class PointNet2Interface:
             dist = tf.linalg.norm(self.sink_source[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :], axis = 3)
             rbf = tf.exp(-((dist / self.epsilon) ** 2))[:, :, :, tf.newaxis]
             perturb = rbf * (sinks[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :])
-            self.x_perturb = self.x_clean + tf.reduce_sum(perturb, axis = 1)
+            self.x_perturb = self.x_clean + tf.tanh(tf.reduce_sum(perturb, axis = 1))
 
             with tf.variable_scope(tf.get_variable_scope(), reuse = tf.AUTO_REUSE):
                 logits, end_points = model.get_model(self.x_perturb, self.is_training)

@@ -4,14 +4,15 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # attacks
 paths = [
-    "",
-    "",
-    "",
-    "",
-    ""
+    "../output_save/final/1564113021_pointnet_none_none.npz",
+    "../output_save/final/1564130586_pointnet_iter_l2_attack_none.npz",
+    "../output_save/final/1564164544_pointnet_iter_l2_attack_n_proj_none.npz",
+    "../output_save/final/1564190398_pointnet_iter_l2_attack_n_sampling_none.npz",
+    "../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz",
+    "../output_save/final/1564228868_pointnet_iter_l2_attack_sinks_none.npz"
 ]
 
-xlabels = ["iter. gradient $L_2$", "distribution", "perturb. resample", "adv. sticks", "adv. sinks"]
+xlabels = ["None", "Iter. gradient $L_2$", "Distribution", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
 
 models = ["car", "person", "lamp", "chair", "vase"]
 offset_idx = [0, 0, 0, 0, 0]
@@ -26,29 +27,29 @@ match_idx = []
 
 for i, model in enumerate(models):
     model_idx = shape_names.index(model)
-    idx = np.where(np.argmax(files[0][0]["y_pred"], axis = 1) == model_idx)[0]
+    idx = np.where(np.argmax(files[0]["y_pred"], axis = 1) == model_idx)[0]
     idx = idx[offset_idx[i]]
     match_idx.append(idx)
 
-plt.figure(figsize = (30, 20))
+plt.figure(figsize = (20, 20))
 
 def scale_plot():
-    plt.gca().auto_scale_xyz((-1, 1), (-1, 1), (-1, 1))
-    plt.gca().view_init(0, 0)
+    scale = 0.7
+    plt.gca().auto_scale_xyz((-scale, scale), (-scale, scale), (-scale, scale))
+    plt.gca().view_init(30, 120)
     plt.axis("off")
 
 for i, idx in enumerate(match_idx):
     for j, f in enumerate(files):
-        plt.subplot(len(match_idx), len(files), i * len(files) + j, projection = "3d")
-        plt.gca().scatter(*f["x_adv"][idx].T, zdir = "y", s = 20, c = f["x_adv"][idx].T[1], cmap = "winter")
-
-        if i == len(match_idx) - 1:
-            plt.xlabel(xlabels[j])
-
-        if j == 0:
-            plt.ylabel(models[i])
-
+        plt.subplot(len(match_idx), len(files), i * len(files) + j + 1, projection = "3d")
+        plt.gca().scatter(*f["x_adv"][idx].T, zdir = "y", s = 5, c = f["x_adv"][idx].T[2], cmap = "winter")
         scale_plot()
+
+for i in range(len(xlabels)):
+    plt.gcf().text(i / float(len(xlabels)) + 0.5 / len(xlabels), 0.97, xlabels[i], fontsize = 30, horizontalalignment = "center")
+
+for i in range(len(models)):
+    plt.gcf().text(0.01, i / float(len(models)) + 0.5 / len(models), models[-i - 1], fontsize = 30, rotation = "vertical", verticalalignment = "center")
 
 plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1, wspace = 0, hspace = 0)
 plt.tight_layout()
