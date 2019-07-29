@@ -2,6 +2,10 @@ from matplotlib import pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
+plt.rcParams["text.usetex"] = True
+plt.rcParams["text.latex.unicode"] = True
+plt.rcParams["font.family"] = "serif"
+
 # defenses x attacks
 paths = [
     [
@@ -10,7 +14,7 @@ paths = [
         "../output_save/final/1564164544_pointnet_iter_l2_attack_n_proj_none.npz",
         "../output_save/final/1564190398_pointnet_iter_l2_attack_n_sampling_none.npz",
         "../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz",
-        "../output_save/final/1564228868_pointnet_iter_l2_attack_sinks_none.npz"
+        "../output_save/final/1564384193_pointnet_iter_l2_attack_sinks_none.npz"
     ],
     [
         "../output_save/final/1564113228_pointnet_none_remove_outliers_defense.npz",
@@ -18,7 +22,7 @@ paths = [
         "../output_save/final/1564164752_pointnet_iter_l2_attack_n_proj_remove_outliers_defense.npz",
         "../output_save/final/1564190606_pointnet_iter_l2_attack_n_sampling_remove_outliers_defense.npz",
         "../output_save/final/1564209144_pointnet_iter_l2_adversarial_sticks_remove_outliers_defense.npz",
-        "../output_save/final/1564229079_pointnet_iter_l2_attack_sinks_remove_outliers_defense.npz"
+        "../output_save/final/1564384406_pointnet_iter_l2_attack_sinks_remove_outliers_defense.npz"
     ],
     [
         "../output_save/final/1564114212_pointnet_none_remove_salient_defense.npz",
@@ -26,7 +30,7 @@ paths = [
         "../output_save/final/1564165709_pointnet_iter_l2_attack_n_proj_remove_salient_defense.npz",
         "../output_save/final/1564191563_pointnet_iter_l2_attack_n_sampling_remove_salient_defense.npz",
         "../output_save/final/1564210100_pointnet_iter_l2_adversarial_sticks_remove_salient_defense.npz",
-        "../output_save/final/1564230037_pointnet_iter_l2_attack_sinks_remove_salient_defense.npz"
+        "../output_save/final/1564385405_pointnet_iter_l2_attack_sinks_remove_salient_defense.npz"
     ]
 ]
 

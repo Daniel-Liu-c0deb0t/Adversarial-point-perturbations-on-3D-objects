@@ -2,6 +2,10 @@ from matplotlib import pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
+plt.rcParams["text.usetex"] = True
+plt.rcParams["text.latex.unicode"] = True
+plt.rcParams["font.family"] = "serif"
+
 # attacks
 paths = [
     "../output_save/final/1564113021_pointnet_none_none.npz",
@@ -9,7 +13,7 @@ paths = [
     "../output_save/final/1564164544_pointnet_iter_l2_attack_n_proj_none.npz",
     "../output_save/final/1564190398_pointnet_iter_l2_attack_n_sampling_none.npz",
     "../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz",
-    "../output_save/final/1564228868_pointnet_iter_l2_attack_sinks_none.npz"
+    "../output_save/final/1564384193_pointnet_iter_l2_attack_sinks_none.npz"
 ]
 
 xlabels = ["None", "Iter. gradient $L_2$", "Distribution", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
