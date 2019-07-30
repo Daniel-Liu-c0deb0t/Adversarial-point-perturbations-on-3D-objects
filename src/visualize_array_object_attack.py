@@ -56,7 +56,7 @@ for i in range(len(models)):
     plt.gcf().text(0.05, i / (float(len(models)) + 0.1) + 0.5 / len(models), models[-i - 1].capitalize(), fontsize = 30, rotation = "vertical", verticalalignment = "center")
 
 plt.gcf().text(0.5, 0.96, "Attacks", fontsize = 40, horizontalalignment = "center")
-plt.gcf().text(0.01, 0.5, "Defenses", fontsize = 40, rotation = "vertical", verticalalignment = "center")
+plt.gcf().text(0.01, 0.5, "Objects", fontsize = 40, rotation = "vertical", verticalalignment = "center")
 
 plt.subplots_adjust(left = 0.05, bottom = 0, right = 1, top = 0.95, wspace = 0, hspace = 0)
 plt.savefig("../figures/object_attack.pdf", bbox_inches = "tight")
