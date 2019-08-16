@@ -4,7 +4,7 @@ New distributional and shape attacks on neural networks that process 3D point cl
 # Setup
 Initially, part of the code for training/testing neural networks was designed to be ran on a server with GPUs, and the other part for visualizing results was supposed to be ran on a personal computer. The setup instructions below are for running both parts on the same computer. This means that some installation decisions may be kind of weird.
 
-This is the directory structure of the project:
+This is the final directory structure of the project:
 ```
 - /
   - pointnet/
@@ -37,10 +37,34 @@ curl https://github.com/Daniel-Liu-c0deb0t/Adversarial-point-perturbations-on-3D
 ```
 The triangle each point was sampled from are included.
 
-In this project, there are two types of runnable scripts: visualization scripts and experiment scripts.
+In this project, there are two types of runnable scripts in the `src` folder: visualization scripts and experiment scripts.
 
 Experiment scripts:
-- 
+- `run_adversarial_examples.py`
+- `run_old_adversarial_examples.py`
 
 Visualization scripts:
-- 
+- `example_alpha_shape.py`
+- `example_perturb_proj_tree.py`
+- `example_projection.py`
+- `visualize_array_attack_object.py`
+- `visualize_array_object_attack.py`
+- `visualize_perturbed_point_cloud.py`
+
+Experiment scripts need to be launched from the root directory:
+```
+cd /
+python Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_examples.py
+```
+
+Visualization scripts need to be launched from the `src` directory:
+```
+cd /Adversarial-point-perturbations-on-3D-objects/src/
+python example_projection.py
+```
+
+Adjusting parameters is mainly accomplished by editing the hardcoded values in the file that is ran. These hardcoded values should appear in the first few lines of the file. For running visualization scripts prefixed with `visualize_`, you need to edit it and replace the existing paths with files that you obtained from running the experiment scripts. To run the experiments reported in the paper with default settings, directly run
+```
+python Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_examples.py
+```
+The `run_old_adversarial_examples.py` script automatically goes through the attacks and defenses on PointNet. Note that the names of some parameters do not match the variables used in the paper, but the parameters' default values are the same as those reported in the paper.
