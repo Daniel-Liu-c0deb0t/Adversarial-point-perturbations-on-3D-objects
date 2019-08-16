@@ -8,16 +8,16 @@ You need Python 2.7 with TensorFlow 1.14, Matplotlib, Numpy, Numba, and Scipy.
 
 This is the final directory structure of the project:
 ```
-- /
-  - pointnet/
-  - pointnet2/
-  - Adversarial-point-perturbations-on-3D-objects/
-    - pointnet/
-    - pointnet2/
-    - src/
-    - data/
-    - output_save/
-    - figures/
+/
+    pointnet/
+    pointnet2/
+    Adversarial-point-perturbations-on-3D-objects/
+        pointnet/
+        pointnet2/
+        src/
+        data/
+        output_save/
+        figures/
 ```
 
 We will assume that an empty folder is created somewhere, and we will refer to it as the root folder, or `/`. The first step is to clone three different repositories into the root folder: [PointNet](https://github.com/charlesq34/pointnet), [PointNet++](https://github.com/charlesq34/pointnet2), and this repo.
