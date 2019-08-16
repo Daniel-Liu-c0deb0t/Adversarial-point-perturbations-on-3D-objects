@@ -51,9 +51,9 @@ defense_args = dict(args.defense_args)
 fft = test_attack == "iter_l2_attack_fft"
 sink = int(attack_args["num_sinks"]) if test_attack == "iter_l2_attack_sinks" else None
 
-class_names_path = "pointnet/data/modelnet40_ply_hdf5_2048/shape_names.txt"
-input_data_path = "pointnet/point_clouds.npz"
-output_dir = "output_save"
+class_names_path = "Adversarial-Point-Perturbations-on-3D-Objects/data/shape_names.txt"
+input_data_path = "Adversarial-Point-Perturbations-on-3D-Objects/data/point_clouds.npz"
+output_dir = "Adversarial-Point-Perturbations-on-3D-Objects/output_save"
 num_point_clouds = 10000
 max_points = 1024
 

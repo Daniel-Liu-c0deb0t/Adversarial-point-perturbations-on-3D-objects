@@ -7,7 +7,7 @@ np.random.seed(1234)
 view_label = "stool"
 offset_idx = 0
 f = np.load("../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz")
-shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
+shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 show_grads = True
 show_true = False
 

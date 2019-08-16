@@ -39,7 +39,7 @@ ylabels = ["None", "Remove outliers", "Remove salient"]
 
 model = "airplane"
 offset_idx = 0
-shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
+shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 files = []
 

@@ -20,7 +20,7 @@ xlabels = ["None", "Iter. gradient $L_2$", "Distribution", "Perturb. resample", 
 
 models = ["car", "person", "lamp", "chair", "vase"]
 offset_idx = [0, 0, 0, 0, 0]
-shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
+shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 files = []
 

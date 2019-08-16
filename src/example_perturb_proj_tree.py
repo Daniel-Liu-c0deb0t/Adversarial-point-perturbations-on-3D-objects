@@ -10,8 +10,8 @@ np.random.seed(1234)
 view_label = "chair"
 offset_idx = 0
 num_points = 1024
-f = np.load("/media/sf_Xubuntu_shared/modelnet40_pc/point_clouds.npz")
-shape_names = [line.rstrip() for line in open("/media/sf_Xubuntu_shared/modelnet40_pc/shape_names.txt")]
+f = np.load("../data/point_clouds.npz")
+shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 pc = f["points"][:, :num_points]
 labels = f["labels"]
