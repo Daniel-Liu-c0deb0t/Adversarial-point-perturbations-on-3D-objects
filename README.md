@@ -1,6 +1,15 @@
 # Adversarial point perturbations on 3D objects
 New distributional and shape attacks on neural networks that process 3D point cloud data.
 
+Currently, it is quite easy to generate effective adversarial attacks, in both 2D and 3D. The goal in this work is to generate adversarial examples that uses shape information intrinsic to 3D point sets. Four attacks are proposed:
+
+- The **distributional attack** that perturbs points on or very near the surface of a 3D object. The surface for a point cloud is approximated by using the alpha shape triangulation algorithm on the points, and projected gradient descent to move points on or near the shape. This is sped up by building a VP-tree.
+- The **perturbation resampling** attack that does standard gradient descent to attack, but then estimates the shape through triangulation and resamples points on the estimated shape. This ensures that the points are distributed on the surface of the 3D object with uniform density.
+- The **adversarial sticks** attack that creates a few sticks connected to the shape of a point cloud, which is once again estimated through triangulation. The aim of this attack was the ease of construction in real-life. Adversarial examples are generated through gradient descent to approximate effective stick orientations by perturbing a few points, and resampling points onto the sticks.
+- The **adversarial sinks** attack that pulls points to sinks (kind of like black holes) to perturb the shape. The strength of the pull falls off over distance. Adversarial examples are generated using first-order methods like Adam.
+
+The last three methods are effective against point removal defenses, like outlier and salient point removal, and they are generally easier to construct in real-life.
+
 # Setup
 Initially, part of the code for training/testing neural networks was designed to be ran on a server with GPUs, and the other part for visualizing results was supposed to be ran on a personal computer. The setup instructions below are for running both parts on the same computer. This means that some instructions/design decisions may be kind of weird.
 
