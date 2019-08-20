@@ -1,6 +1,8 @@
 # Adversarial point perturbations on 3D objects
 New distributional and shape attacks on neural networks that process 3D point cloud data. Preprint paper: **[here](https://arxiv.org/abs/1908.06062)**.
 
+![](schematics.png)
+
 Currently, it is quite easy to generate effective adversarial attacks, in both 2D and 3D. The goal in this work is to generate adversarial examples that uses shape information intrinsic to 3D point sets. Four attacks are proposed:
 
 - The **distributional attack** that perturbs points on or very near the surface of a 3D object. The surface for a point cloud is approximated by using the alpha shape triangulation algorithm on the points, and projected gradient descent to move points on or near the shape. This is sped up by building a VP-tree.
