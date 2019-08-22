@@ -1,5 +1,14 @@
 # Adversarial point perturbations on 3D objects
-New distributional and shape attacks on neural networks that process 3D point cloud data. Preprint paper: **[here](https://arxiv.org/abs/1908.06062)**.
+New distributional and shape attacks on neural networks that process 3D point cloud data. Preprint paper: **[here](https://arxiv.org/abs/1908.06062)**. If you use this code, please cite
+
+```
+@article{liu2019adversarial,
+  title={Adversarial point perturbations on 3D objects},
+  author={Liu, Daniel and Yu, Ronald and Su, Hao},
+  journal={arXiv preprint arXiv:1908.06062},
+  year={2019}
+}
+```
 
 ![](schematics.png)
 
