@@ -82,7 +82,7 @@ def bounding_sphere(tri):
     A_to_C = C - A
     B_to_C = C - B
 
-    if np.dot(A_to_B, A_to_C) <= 0.0 and np.dot(A_to_B, B_to_C) <= 0.0 and np.dot(A_to_C, B_to_C) <= 0.0:
+    if np.dot(B - A, C - A) <= 0.0 or np.dot(A - B, C - B) <= 0.0 or np.dot(A - C, B - C) <= 0.0:
         # right or obtuse triangle
         edges = np.array((np.linalg.norm(A_to_B), np.linalg.norm(A_to_C), np.linalg.norm(B_to_C)))
         idx = np.argmax(edges)
