@@ -44,7 +44,7 @@ class PerturbProjTree:
         distances = np.linalg.norm(curr_tri_center - partition_center[np.newaxis, :], axis = 1)
 
         # pick the middle point to for the partition radius
-        lo = len(distances + 1) // 2
+        lo = (len(distances) + 1) // 2
         hi = lo - 1
         # sort by negative distances so all triangle points with the same distance
         # as the picked mid distance will be to the right in the partition array
