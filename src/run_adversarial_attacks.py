@@ -24,13 +24,16 @@ attacks = {
         "iter_l2_attack_n_proj": adversarial_attacks.iter_l2_attack_n_proj,
         "iter_l2_attack_n_sampling": adversarial_attacks.iter_l2_attack_n_sampling,
         "iter_l2_adversarial_sticks": adversarial_attacks.iter_l2_adversarial_sticks,
-        "iter_l2_attack_sinks": adversarial_attacks.iter_l2_attack_sinks
+        "iter_l2_attack_sinks": adversarial_attacks.iter_l2_attack_sinks,
+        "chamfer_attack": adversarial_attacks.chamfer_attack
 }
 
 defenses = {
         "none": lambda _a, x, _b: x,
         "remove_outliers_defense": adversarial_defenses.remove_outliers_defense,
-        "remove_salient_defense": adversarial_defenses.remove_salient_defense
+        "remove_salient_defense": adversarial_defenses.remove_salient_defense,
+        "random_perturb_defense": adversarial_defenses.random_perturb_defense,
+        "random_remove_defense": adversarial_defenses.random_remove_defense
 }
 
 parser = argparse.ArgumentParser(description = "Adversarial attacks and defenses on PointNet and PointNet++.")
@@ -50,6 +53,7 @@ defense_args = dict(args.defense_args)
 
 fft = test_attack == "iter_l2_attack_fft"
 sink = int(attack_args["num_sinks"]) if test_attack == "iter_l2_attack_sinks" else None
+chamfer = test_attack == "chamfer_attack"
 
 class_names_path = "Adversarial-point-perturbations-on-3D-objects/data/shape_names.txt"
 input_data_path = "Adversarial-point-perturbations-on-3D-objects/data/point_clouds.npz"
@@ -71,7 +75,7 @@ with np.load(input_data_path) as file:
 
 model_name = test_model
 model_type = models[test_model]
-model = model_type(max_points, fft = fft, sink = sink)
+model = model_type(max_points, fft = fft, sink = sink, chamfer = chamfer)
 
 attack_name = test_attack
 attack_fn = attacks[test_attack]
@@ -91,7 +95,7 @@ attack_start_time = time.time()
 successfully_attacked = 0
 total_attacked = 0
 all_attacked = []
-avg_dist = 0.0
+#avg_dist = 0.0
 
 for idx in range(len(X)):
     x = X[idx]
@@ -106,10 +110,10 @@ for idx in range(len(X)):
         grad_adv = model.grad_fn(x_adv, y_idx)
         y_adv_pred_idx = np.argmax(y_adv_pred)
 
-        if defense_name == "none":
-            x_adv_proj = project_points_to_triangles(x_adv, t)
-            dist = np.max(np.linalg.norm(x_adv_proj - x_adv, axis = 1))
-            avg_dist += dist
+        #if defense_name == "none":
+        #    x_adv_proj = project_points_to_triangles(x_adv, t)
+        #    dist = np.max(np.linalg.norm(x_adv_proj - x_adv, axis = 1))
+        #    avg_dist += dist
 
         if y_adv_pred_idx != y_idx:
             successfully_attacked += 1
@@ -124,15 +128,15 @@ timestamp = int(time.time())
 save_file = "%s/%d_%s_%s_%s.npz" % (output_dir, timestamp, model_name, attack_name, defense_name)
 np.savez_compressed(save_file, x = all_attacked[0], y_pred = all_attacked[1], x_adv = all_attacked[2], y_adv_pred = all_attacked[3], grad_adv = all_attacked[4])
 
-avg_dist = avg_dist / float(len(X))
+#avg_dist = avg_dist / float(len(X))
 
 print("Current time\t%d" % timestamp)
 print("Elapsed time\t%f" % (timestamp - attack_start_time))
 print("Number of attempted attacks\t%d" % total_attacked)
 print("Number of successful attacks\t%d" % successfully_attacked)
 
-if defense_name == "none":
-    print("Average Haussdorf distance\t%f" % avg_dist)
+#if defense_name == "none":
+#    print("Average Haussdorf distance\t%f" % avg_dist)
 
 print("Data saved in\t%s" % save_file)
 print()

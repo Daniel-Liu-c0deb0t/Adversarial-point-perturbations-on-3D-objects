@@ -34,3 +34,21 @@ def remove_salient_defense(model, x, params):
     x[remove] = x[idx]
 
     return x
+
+def random_perturb_defense(model, x, params):
+    std = float(params["std"])
+
+    x = x + std * np.random.randn(*x.shape)
+
+    return x
+
+def random_remove_defense(model, x, params):
+    num_points = int(params["num_points"])
+
+    remove = np.random.choice(len(x), size = num_points, replace = False)
+    mask = np.zeros(len(x))
+    mask[remove] = 1.0
+    idx = np.argmin(mask)
+    x[remove] = x[idx]
+
+    return x
