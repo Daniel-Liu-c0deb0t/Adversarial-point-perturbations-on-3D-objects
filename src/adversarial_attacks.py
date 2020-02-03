@@ -371,9 +371,9 @@ def iter_l2_attack_sinks(model, x, y, params):
     
     pred_idx = np.argmax(model.pred_fn(x))
     
-    lo = 0
-    hi = lambda_
-    res = 0
+    lo = 0.0
+    hi = float(lambda_)
+    res = x
     
     # binary search for lambda
     for _ in range(20):
@@ -384,13 +384,15 @@ def iter_l2_attack_sinks(model, x, y, params):
         for i in range(n):
             model.train_sink_fn(x, y, sink_source, mu, mid, eta)
         
-        if pred_idx == np.argmax(model.pred_fn(model.x_perturb_sink_fn(x, sink_source, mu, mid))):
+        x_perturb = model.x_perturb_sink_fn(x, sink_source, mu, mid)
+        
+        if pred_idx == np.argmax(model.pred_fn(x_perturb)):
             hi = mid
         else:
             lo = mid
-            res = mid
+            res = x_perturb
 
-    return model.x_perturb_sink_fn(x, sink_source, mu, res)
+    return res
 
 def chamfer_attack(model, x, y, params):
     eta = float(params["eta"])
@@ -400,9 +402,9 @@ def chamfer_attack(model, x, y, params):
     
     pred_idx = np.argmax(model.pred_fn(x))
     
-    lo = 0
-    hi = alpha
-    res = 0
+    lo = 0.0
+    hi = float(alpha)
+    res = x
     
     # binary search for lambda
     for _ in range(20):
@@ -413,10 +415,12 @@ def chamfer_attack(model, x, y, params):
         for i in range(n):
             model.train_chamfer_fn(x, y, mid, lambda_, eta)
         
-        if pred_idx == np.argmax(model.pred_fn(model.x_perturb_chamfer_fn())):
+        x_perturb = model.x_perturb_chamfer_fn()
+        
+        if pred_idx == np.argmax(model.pred_fn(x_perturb)):
             hi = mid
         else:
             lo = mid
-            res = mid
+            res = x_perturb
 
-    return model.x_perturb_chamfer_fn()
+    return res
