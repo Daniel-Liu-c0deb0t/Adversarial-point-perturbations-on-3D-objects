@@ -11,7 +11,7 @@ np.random.seed(1234)
 view_label = "chair"
 offset_idx = 0
 num_points = 1024
-f = h5py.File("../data/point_clouds.h5py", "r")
+f = h5py.File("../data/point_clouds.hdf5", "r")
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 pc = f["points"][:][:, :num_points]
