@@ -1,4 +1,5 @@
 import numpy as np
+import h5py
 import time
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -10,11 +11,13 @@ np.random.seed(1234)
 view_label = "chair"
 offset_idx = 0
 num_points = 1024
-f = np.load("../data/point_clouds.npz")
+f = h5py.File("../data/point_clouds.h5py", "r")
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
-pc = f["points"][:, :num_points]
-labels = f["labels"]
+pc = f["points"][:][:, :num_points]
+labels = f["labels"][:]
+
+f.close()
 
 print("Shape:", pc.shape)
 print("Number of points:", num_points)
