@@ -1,4 +1,5 @@
 import numpy as np
+import h5py
 import adversarial_attacks
 import adversarial_defenses
 from true_proj import project_points_to_triangles
@@ -55,7 +56,7 @@ defenses = (
 test_defenses = (0, 1, 2, 3, 4)
 
 class_names_path = "Adversarial-point-perturbations-on-3D-objects/data/shape_names.txt"
-input_data_path = "Adversarial-point-perturbations-on-3D-objects/data/point_clouds.npz"
+input_data_path = "Adversarial-point-perturbations-on-3D-objects/data/point_clouds.hdf5"
 output_dir = "Adversarial-point-perturbations-on-3D-objects/output_save"
 num_point_clouds = 10000
 max_points = 1024
@@ -67,10 +68,10 @@ except OSError:
 
 class_names = [line.rstrip() for line in open(class_names_path)]
 
-with np.load(input_data_path) as file:
-    X = file["points"][:num_point_clouds, :max_points, :]
-    Y = file["labels"][:num_point_clouds]
-    T = file["faces"][:num_point_clouds, :, :3, :]
+with h5py.File(input_data_path, "r") as file:
+    X = file["points"][:][:num_point_clouds, :max_points, :]
+    Y = file["labels"][:][:num_point_clouds]
+    T = file["faces"][:][:num_point_clouds, :, :3, :]
 
 for model_idx in test_models:
     model_name = models[model_idx][0]
