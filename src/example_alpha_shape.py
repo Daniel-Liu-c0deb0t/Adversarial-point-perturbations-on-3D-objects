@@ -15,6 +15,8 @@ shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 pc = f["points"][:][:, :num_points]
 labels = f["labels"][:]
 
+f.close()
+
 print("Shape:", pc.shape)
 print("Number of points:", num_points)
 print("Labels:", [shape_names[idx] for idx in np.unique(labels)])
