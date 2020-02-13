@@ -24,7 +24,7 @@ The last three methods are effective against point removal defenses, like outlie
 # Setup
 Initially, part of the code for training/testing neural networks was designed to be ran on a server with GPUs, and the other part for visualizing results was supposed to be ran on a personal computer. The setup instructions below are for running both parts on the same computer.
 
-You need Python 2.7 with TensorFlow 1.14, Matplotlib, Numpy, Numba, and Scipy.
+You need Python 2.7 with TensorFlow 1.4, Matplotlib, Numpy, Numba, and Scipy.
 
 This is the final directory structure of the project:
 ```
@@ -43,7 +43,7 @@ We will assume that an empty folder is created somewhere, and we will refer to i
 
 The first step is to clone three different repositories into the root folder: [PointNet](https://github.com/charlesq34/pointnet), [PointNet++](https://github.com/charlesq34/pointnet2), and this repo.
 
-Then, copy the modified PointNet files from the `/Adversarial-point-perturbations-on-3D-objects/pointnet/` directory to the cloned PointNet repo `/pointnet/`, and do the same for PointNet++. The modified files contain some bug fixes and other nonessential modifications that carried over from my previous [code](https://github.com/Daniel-Liu-c0deb0t/3D-Neural-Network-Adversarial-Attacks). Other than fixing a batch norm bug for PointNet, the other changes in the modified PointNet/PointNet++ files should not be necessary for this project, but I included all changes just in case.
+Then, copy the modified PointNet files from the `/Adversarial-point-perturbations-on-3D-objects/pointnet/` directory to the cloned PointNet repo `/pointnet/`, and do the same for PointNet++. The modified files contain some bug fixes and other nonessential modifications that carried over from my previous [code](https://github.com/Daniel-Liu-c0deb0t/3D-Neural-Network-Adversarial-Attacks). Other than fixing a batch norm bug for PointNet, the other changes in the modified PointNet/PointNet++ files should not be necessary for this project, but I included all changes just in case. Note that PointNet++ needs some compiled C++ code for its operations. Read the directions given in the repo and modify the bash scripts for TensorFlow 1.4.
 
 Follow the instructions for training PointNet and PointNet++ from their respective repos. A lowered batch size of 10 was used in single-GPU training for PointNet++, for lower memory requirements. The checkpoint files should be saved in `/pointnet/log/` and `/pointnet2/log/` for PointNet and PointNet++.
 
@@ -58,10 +58,10 @@ For each experiment, a file with the adversarial examples, clean examples, and o
 To download the necessary 3D point clouds sampled from the [ModelNet40](https://modelnet.cs.princeton.edu/) dataset, do
 ```
 cd data/
-curl -O https://github.com/Daniel-Liu-c0deb0t/Adversarial-point-perturbations-on-3D-objects/releases/download/Data/point_clouds.npz
+wget https://github.com/Daniel-Liu-c0deb0t/Adversarial-point-perturbations-on-3D-objects/releases/download/Data/point_clouds.hdf5
 cd ..
 ```
-The triangle each point was sampled from are included.
+The triangle each point was sampled from are included in the HDF5 file.
 
 In this project, there are two types of runnable scripts in the `src` folder: visualization scripts and experiment scripts.
 
