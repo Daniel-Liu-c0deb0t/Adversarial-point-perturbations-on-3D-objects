@@ -58,7 +58,7 @@ class PointNet2Interface:
             loss_dist = tf.sqrt(tf.reduce_sum((self.x_perturb - self.x_clean) ** 2, axis = (1, 2), keep_dims = True))
             optimizer = tf.train.AdamOptimizer(learning_rate = self.eta)
             self.train = optimizer.minimize(-loss + self.lambda_ * loss_dist, var_list = [sinks])
-            self.init_optimizer = tf.variables_initializer(optimizer.variables())
+            self.init_optimizer = tf.variables_initializer([optimizer.get_slot(sinks, name) for name in optimizer.get_slot_names()] + list(optimizer._get_beta_accumulators()))
 
         if chamfer:
             self.x_clean_chamfer = tf.placeholder(tf.float32, shape = self.x_pl.shape.as_list())
@@ -82,7 +82,7 @@ class PointNet2Interface:
             loss_l2 = tf.sqrt(tf.reduce_sum((self.x_chamfer - self.x_clean_chamfer) ** 2, axis = (1, 2), keep_dims = True))
             optimizer_chamfer = tf.train.AdamOptimizer(learning_rate = self.eta_chamfer)
             self.train_chamfer = optimizer_chamfer.minimize(-loss + self.alpha_chamfer * (loss_chamfer + self.lambda_chamfer * loss_l2), var_list = [self.x_chamfer])
-            self.init_optimizer_chamfer = tf.variables_initializer(optimizer_chamfer.variables())
+            self.init_optimizer_chamfer = tf.variables_initializer([optimizer_chamfer.get_slot(self.x_chamfer, name) for name in optimizer_chamfer.get_slot_names()] + list(optimizer_chamfer._get_beta_accumulators()))
 
     def clean_up(self):
         self.sess.close()
