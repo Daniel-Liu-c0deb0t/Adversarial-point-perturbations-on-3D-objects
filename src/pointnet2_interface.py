@@ -55,7 +55,7 @@ class PointNet2Interface:
                 logits, end_points = model.get_model(self.x_perturb, self.is_training)
 
             loss = model.get_loss(logits, self.y_pl, end_points)
-            loss_dist = tf.sqrt(tf.reduce_sum((self.x_perturb - self.x_clean) ** 2, axis = (1, 2), keepdims = True))
+            loss_dist = tf.sqrt(tf.reduce_sum((self.x_perturb - self.x_clean) ** 2, axis = (1, 2), keep_dims = True))
             optimizer = tf.train.AdamOptimizer(learning_rate = self.eta)
             self.train = optimizer.minimize(-loss + self.lambda_ * loss_dist, var_list = [sinks])
             self.init_optimizer = tf.variables_initializer(optimizer.variables())
@@ -71,15 +71,15 @@ class PointNet2Interface:
             
             dist = tf.linalg.norm(self.x_chamfer[:, :, tf.newaxis, :] - self.x_clean_chamfer[:, tf.newaxis, :, :], axis = 3)
             dist = tf.where(tf.eye(self.x_pl.shape.as_list()[1], batch_shape = (1,), dtype = tf.bool), tf.fill(dist.shape.as_list(), float("inf")), dist)
-            dist = tf.reduce_min(dist, axis = 2, keepdims = True)
-            loss_chamfer = tf.reduce_mean(dist, axis = 1, keepdims = True)
+            dist = tf.reduce_min(dist, axis = 2, keep_dims = True)
+            loss_chamfer = tf.reduce_mean(dist, axis = 1, keep_dims = True)
             
             with tf.variable_scope(tf.get_variable_scope(), reuse = tf.AUTO_REUSE):
                 logits, end_points = model.get_model(self.x_chamfer, self.is_training)
 
             loss = model.get_loss(logits, self.y_pl, end_points)
             
-            loss_l2 = tf.sqrt(tf.reduce_sum((self.x_chamfer - self.x_clean_chamfer) ** 2, axis = (1, 2), keepdims = True))
+            loss_l2 = tf.sqrt(tf.reduce_sum((self.x_chamfer - self.x_clean_chamfer) ** 2, axis = (1, 2), keep_dims = True))
             optimizer_chamfer = tf.train.AdamOptimizer(learning_rate = self.eta_chamfer)
             self.train_chamfer = optimizer_chamfer.minimize(-loss + self.alpha_chamfer * (loss_chamfer + self.lambda_chamfer * loss_l2), var_list = [self.x_chamfer])
             self.init_optimizer_chamfer = tf.variables_initializer(optimizer_chamfer.variables())
