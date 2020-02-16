@@ -105,9 +105,13 @@ def corner_point(points):
     res = np.full(3, -np.inf)
 
     for i in range(len(points)):
-        diff_idx = np.nonzero(points[i] != res)[0][0]
+        for j in range(3):
+            skip = points[i][j] != res[j]
 
-        if points[i][diff_idx] > res[diff_idx]:
-            res = points[i]
+            if points[i][j] > res[j]:
+                res = points[i]
+
+            if skip:
+                break
 
     return res
