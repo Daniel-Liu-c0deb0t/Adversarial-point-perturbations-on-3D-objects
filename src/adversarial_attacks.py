@@ -410,7 +410,7 @@ def chamfer_attack(model, x, y, params):
     for _ in range(20):
         mid = (lo + hi) / 2.0
         
-        model.reset_chamfer_fn(x)
+        model.reset_chamfer_fn(x + 0.00001 * np.random.normal(size = x.shape))
 
         for i in range(n):
             model.train_chamfer_fn(x, y, mid, lambda_, eta)
