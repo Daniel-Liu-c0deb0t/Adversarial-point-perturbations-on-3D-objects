@@ -80,19 +80,19 @@ Visualization scripts:
 Experiment scripts need to be launched from the root directory:
 ```
 cd /
-python Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_examples.py
+python -u Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_examples.py
 ```
 
 Visualization scripts need to be launched from the `src` directory:
 ```
 cd /Adversarial-point-perturbations-on-3D-objects/src/
-python example_projection.py
+python -u example_projection.py
 ```
 Visualization scripts show a Matplotlib window.
 
 Adjusting parameters is mainly accomplished by editing the hardcoded values in the file that is ran. These hardcoded values should appear in the first few lines of the file. For running visualization scripts prefixed with `visualize_`, you need to edit it and replace the existing paths with files that you obtained from running the experiment scripts. To run the experiments reported in the paper with default settings, directly run
 ```
 cd /
-python Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_examples.py
+python -u Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_examples.py
 ```
 The `run_old_adversarial_examples.py` script automatically goes through the attacks and defenses on PointNet. When adjusting parameters, note that the names of some parameters do not match the variables used in the paper, but the parameters' default values are the same as those reported in the paper. Each unique combination of network, attack, and defense generates a unique file in the `output_size` folder that contains saved clean/adversarial examples. All statistics are printed to stdout. Running all experiments may take a **long** time. Comment out the blocks starting with `if defense_name == "none":` will drastically speed up the process. This is because computing the Hausdorff distance with the true shape (triangular mesh) is very slow.
