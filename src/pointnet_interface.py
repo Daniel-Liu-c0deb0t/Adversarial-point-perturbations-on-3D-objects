@@ -81,7 +81,6 @@ class PointNetInterface:
             self.init_x_chamfer = tf.assign(self.x_chamfer, self.x_init_chamfer)
             
             dist = tf.linalg.norm(self.x_chamfer[:, :, tf.newaxis, :] - self.x_clean_chamfer[:, tf.newaxis, :, :], axis = 3)
-            dist = tf.where(tf.eye(self.x_pl.shape.as_list()[1], batch_shape = (1,), dtype = tf.bool), tf.fill(dist.shape.as_list(), float("inf")), dist)
             dist = tf.reduce_min(dist, axis = 2, keep_dims = True)
             loss_chamfer = tf.reduce_mean(dist, axis = 1, keep_dims = True)
             
