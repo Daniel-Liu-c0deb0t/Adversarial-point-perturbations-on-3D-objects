@@ -62,12 +62,13 @@ class PointNet2Interface:
 
         if chamfer:
             self.x_clean_chamfer = tf.placeholder(tf.float32, shape = self.x_pl.shape.as_list())
+            self.x_init_chamfer = tf.placeholder(tf.float32, shape = self.x_pl.shape.as_list())
             self.lambda_chamfer = tf.placeholder(tf.float32, shape = ())
             self.alpha_chamfer = tf.placeholder(tf.float32, shape = ())
             self.eta_chamfer = tf.placeholder(tf.float32, shape = ())
             self.x_chamfer = tf.get_variable("x_chamfer", dtype = tf.float32, shape = self.x_pl.shape.as_list())
 
-            self.init_x_chamfer = tf.assign(self.x_chamfer, self.x_clean_chamfer)
+            self.init_x_chamfer = tf.assign(self.x_chamfer, self.x_init_chamfer)
             
             dist = tf.linalg.norm(self.x_chamfer[:, :, tf.newaxis, :] - self.x_clean_chamfer[:, tf.newaxis, :, :], axis = 3)
             dist = tf.where(tf.eye(self.x_pl.shape.as_list()[1], batch_shape = (1,), dtype = tf.bool), tf.fill(dist.shape.as_list(), float("inf")), dist)
@@ -96,7 +97,7 @@ class PointNet2Interface:
 
     def reset_chamfer_fn(self, x):
         self.sess.run(self.init_optimizer_chamfer)
-        self.sess.run(self.init_x_chamfer, feed_dict = {self.x_clean_chamfer: [x]})
+        self.sess.run(self.init_x_chamfer, feed_dict = {self.x_init_chamfer: [x]})
     
     def x_perturb_sink_fn(self, x, sink_source, epsilon, lambda_):
         return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sink_source: [sink_source], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0].astype(float)
