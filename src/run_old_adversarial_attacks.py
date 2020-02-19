@@ -49,7 +49,7 @@ defenses = (
         ("none", lambda _a, x, _b: x, {}),
         ("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 1.0}),
         ("remove_salient_defense", adversarial_defenses.remove_salient_defense, {"top_k": 200}),
-        ("random_perturb_defense", adversarial_defenses.random_perturb_defense, {"std": 0.05}),
+        ("random_perturb_defense", adversarial_defenses.random_perturb_defense, {"std": 0.1}),
         ("random_remove_defense", adversarial_defenses.random_remove_defense, {"num_points": 200})
 )
 
