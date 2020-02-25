@@ -4,22 +4,22 @@ from mpl_toolkits.mplot3d import Axes3D
 
 plt.rcParams["text.usetex"] = True
 plt.rcParams["text.latex.unicode"] = True
-plt.rcParams["font.family"] = "serif"
 
 # attacks
 paths = [
-    "../output_save/final/1564113021_pointnet_none_none.npz",
-    "../output_save/final/1564130586_pointnet_iter_l2_attack_none.npz",
-    "../output_save/final/1564164544_pointnet_iter_l2_attack_n_proj_none.npz",
-    "../output_save/final/1564190398_pointnet_iter_l2_attack_n_sampling_none.npz",
-    "../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz",
-    "../output_save/final/1564384193_pointnet_iter_l2_attack_sinks_none.npz"
+    "../output_save/1582094622_pointnet_none_none.npz",
+    "../output_save/1582096639_pointnet_iter_l2_attack_none.npz",
+    "../output_save/1582508068_pointnet_chamfer_attack_none.npz",
+    "../output_save/1582152554_pointnet_iter_l2_attack_n_proj_none.npz",
+    "../output_save/1582182744_pointnet_iter_l2_attack_n_sampling_none.npz",
+    "../output_save/1582186116_pointnet_iter_l2_adversarial_sticks_none.npz",
+    "../output_save/1582453960_pointnet_iter_l2_attack_sinks_none.npz"
 ]
 
-xlabels = ["None", "Iter. gradient $L_2$", "Distribution", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
+xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Distributional", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
 
 models = ["car", "person", "lamp", "chair", "vase"]
-offset_idx = [0, 0, 0, 0, 0]
+offset_idx = [1, 0, 0, 1, 0]
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 files = []
@@ -50,7 +50,7 @@ for i, idx in enumerate(match_idx):
         scale_plot()
 
 for i in range(len(xlabels)):
-    plt.gcf().text(i / (float(len(xlabels)) + 0.3) + 0.5 / len(xlabels) + 0.05, 0.93, xlabels[i], fontsize = 30, horizontalalignment = "center")
+    plt.gcf().text(i / (float(len(xlabels)) + 0.35) + 0.5 / len(xlabels) + 0.05, 0.93, xlabels[i], fontsize = 30, horizontalalignment = "center")
 
 for i in range(len(models)):
     plt.gcf().text(0.05, i / (float(len(models)) + 0.1) + 0.5 / len(models), models[-i - 1].capitalize(), fontsize = 30, rotation = "vertical", verticalalignment = "center")

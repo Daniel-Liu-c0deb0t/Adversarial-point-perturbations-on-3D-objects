@@ -4,40 +4,42 @@ from mpl_toolkits.mplot3d import Axes3D
 
 plt.rcParams["text.usetex"] = True
 plt.rcParams["text.latex.unicode"] = True
-plt.rcParams["font.family"] = "serif"
 
 # defenses x attacks
 paths = [
     [
-        "../output_save/final/1564113021_pointnet_none_none.npz",
-        "../output_save/final/1564130586_pointnet_iter_l2_attack_none.npz",
-        "../output_save/final/1564164544_pointnet_iter_l2_attack_n_proj_none.npz",
-        "../output_save/final/1564190398_pointnet_iter_l2_attack_n_sampling_none.npz",
-        "../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz",
-        "../output_save/final/1564384193_pointnet_iter_l2_attack_sinks_none.npz"
+        "../output_save/1582094622_pointnet_none_none.npz",
+        "../output_save/1582096639_pointnet_iter_l2_attack_none.npz",
+        "../output_save/1582508068_pointnet_chamfer_attack_none.npz",
+        "../output_save/1582152554_pointnet_iter_l2_attack_n_proj_none.npz",
+        "../output_save/1582182744_pointnet_iter_l2_attack_n_sampling_none.npz",
+        "../output_save/1582186116_pointnet_iter_l2_adversarial_sticks_none.npz",
+        "../output_save/1582453960_pointnet_iter_l2_attack_sinks_none.npz"
     ],
     [
-        "../output_save/final/1564113228_pointnet_none_remove_outliers_defense.npz",
-        "../output_save/final/1564130794_pointnet_iter_l2_attack_remove_outliers_defense.npz",
-        "../output_save/final/1564164752_pointnet_iter_l2_attack_n_proj_remove_outliers_defense.npz",
-        "../output_save/final/1564190606_pointnet_iter_l2_attack_n_sampling_remove_outliers_defense.npz",
-        "../output_save/final/1564209144_pointnet_iter_l2_adversarial_sticks_remove_outliers_defense.npz",
-        "../output_save/final/1564384406_pointnet_iter_l2_attack_sinks_remove_outliers_defense.npz"
+        "../output_save/1582094981_pointnet_none_remove_outliers_defense.npz",
+        "../output_save/1582097003_pointnet_iter_l2_attack_remove_outliers_defense.npz",
+        "../output_save/1582508626_pointnet_chamfer_attack_remove_outliers_defense.npz",
+        "../output_save/1582152895_pointnet_iter_l2_attack_n_proj_remove_outliers_defense.npz",
+        "../output_save/1582183086_pointnet_iter_l2_attack_n_sampling_remove_outliers_defense.npz",
+        "../output_save/1582186458_pointnet_iter_l2_adversarial_sticks_remove_outliers_defense.npz",
+        "../output_save/1582454309_pointnet_iter_l2_attack_sinks_remove_outliers_defense.npz"
     ],
     [
-        "../output_save/final/1564114212_pointnet_none_remove_salient_defense.npz",
-        "../output_save/final/1564131746_pointnet_iter_l2_attack_remove_salient_defense.npz",
-        "../output_save/final/1564165709_pointnet_iter_l2_attack_n_proj_remove_salient_defense.npz",
-        "../output_save/final/1564191563_pointnet_iter_l2_attack_n_sampling_remove_salient_defense.npz",
-        "../output_save/final/1564210100_pointnet_iter_l2_adversarial_sticks_remove_salient_defense.npz",
-        "../output_save/final/1564385405_pointnet_iter_l2_attack_sinks_remove_salient_defense.npz"
+        "../output_save/1582095976_pointnet_none_remove_salient_defense.npz",
+        "../output_save/1582097991_pointnet_iter_l2_attack_remove_salient_defense.npz",
+        "../output_save/1582510577_pointnet_chamfer_attack_remove_salient_defense.npz",
+        "../output_save/1582153775_pointnet_iter_l2_attack_n_proj_remove_salient_defense.npz",
+        "../output_save/1582183969_pointnet_iter_l2_attack_n_sampling_remove_salient_defense.npz",
+        "../output_save/1582187336_pointnet_iter_l2_adversarial_sticks_remove_salient_defense.npz",
+        "../output_save/1582455365_pointnet_iter_l2_attack_sinks_remove_salient_defense.npz"
     ]
 ]
 
-xlabels = ["None", "Iter. gradient $L_2$", "Distribution", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
+xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Distributional", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
 ylabels = ["None", "Remove outliers", "Remove salient"]
 
-model = "airplane"
+model = "stool"
 offset_idx = 0
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
@@ -58,9 +60,9 @@ match_idx = match_idx[offset_idx]
 plt.figure(figsize = (30, 15))
 
 def scale_plot():
-    scale = 0.7
+    scale = 0.85
     plt.gca().auto_scale_xyz((-scale, scale), (-scale, scale), (-scale, scale))
-    plt.gca().view_init(30, 120)
+    plt.gca().view_init(30, 60)
     plt.axis("off")
 
 for i, attack_files in enumerate(files):
@@ -70,7 +72,7 @@ for i, attack_files in enumerate(files):
         scale_plot()
 
 for i in range(len(xlabels)):
-    plt.gcf().text(i / (float(len(xlabels)) + 0.3) + 0.5 / len(xlabels) + 0.05, 0.9, xlabels[i], fontsize = 30, horizontalalignment = "center")
+    plt.gcf().text(i / (float(len(xlabels)) + 0.35) + 0.5 / len(xlabels) + 0.05, 0.9, xlabels[i], fontsize = 30, horizontalalignment = "center")
 
 for i in range(len(ylabels)):
     plt.gcf().text(0.05, i / (float(len(ylabels)) + 0.1) + 0.5 / len(ylabels), ylabels[-i - 1], fontsize = 30, rotation = "vertical", verticalalignment = "center")
