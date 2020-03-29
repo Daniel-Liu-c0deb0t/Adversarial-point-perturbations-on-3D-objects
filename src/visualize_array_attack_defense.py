@@ -88,4 +88,4 @@ def scale_plot():
         plt.gca().view_init(30, 60)
         plt.axis("off")
 
-visualize_array_attack_defense()
+# visualize_array_attack_defense()

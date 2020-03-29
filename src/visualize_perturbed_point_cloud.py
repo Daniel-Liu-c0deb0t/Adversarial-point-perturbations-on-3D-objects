@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def visualize_perturbed_pc(model_label='stool', file_npz="output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz"):
+def visualize_perturbed_pc(model_label='car', file_npz="output_save/pointnet_iter_l2_adversarial_sticks_none.npz"):
     np.random.seed(1234)
 
     view_label = model_label
@@ -70,7 +70,7 @@ def visualize_perturbed_pc(model_label='stool', file_npz="output_save/final/1564
     plt.subplots_adjust(left = 0, bottom = 0, right = 1, top = 1, wspace = 0, hspace = 0)
     plt.tight_layout()
     # save to pdf
-#     plt.savefig("../figures/adv_sticks_grads.pdf", bbox_inches = "tight")
+    plt.savefig("../figures/adv_sticks_grads.pdf", bbox_inches = "tight")
     plt.show()
 
 def scale_plot():
@@ -78,3 +78,5 @@ def scale_plot():
     plt.gca().auto_scale_xyz((-scale, scale), (-scale, scale), (-scale, scale))
     plt.gca().view_init(-30, 200)
     plt.axis("off")
+
+# visualize_perturbed_pc()

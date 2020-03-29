@@ -75,4 +75,4 @@ def scale_plot():
     plt.gca().view_init(30, 120)
     plt.axis("off")
     
-visualize_array_object_attack()
+# visualize_array_object_attack()
