@@ -20,12 +20,12 @@ def visualize_array_object_attack(label_models=["car", "person", "lamp", "chair"
 #     ]
     
     paths =[ 
-        "../output_save/1584848119_pointnet_none_none.npz",
-        "../output_save/1584921487_pointnet_iter_l2_attack_none.npz",
-        "../output_save/1584921969_pointnet_iter_l2_attack_remove_outliers_defense.npz",
-        "../output_save/1584927813_pointnet_iter_l2_attack_remove_salient_defense.npz",
-        "../output_save/1584928086_pointnet_iter_l2_attack_random_perturb_defense.npz",
-        "../output_save/1584928359_pointnet_iter_l2_attack_random_remove_defense.npz"
+        "../output_save/pointnet_none_none.npz",
+        "../output_save/pointnet_iter_l2_attack_none.npz",
+        "../output_save/pointnet_iter_l2_attack_remove_outliers_defense.npz",
+        "../output_save/pointnet_iter_l2_attack_remove_salient_defense.npz",
+        "../output_save/pointnet_iter_l2_attack_random_perturb_defense.npz",
+        "../output_save/pointnet_iter_l2_attack_random_remove_defense.npz"
     ]
 
     xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Distributional", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
@@ -66,7 +66,7 @@ def visualize_array_object_attack(label_models=["car", "person", "lamp", "chair"
 
     plt.subplots_adjust(left = 0.05, bottom = 0, right = 1, top = 0.95, wspace = 0, hspace = 0)
     # save plot to pdf
-#     plt.savefig("../figures/object_attack.pdf", bbox_inches = "tight")
+    plt.savefig("../figures/object_attack.pdf", bbox_inches = "tight")
     plt.show()
 
 def scale_plot():
@@ -74,3 +74,5 @@ def scale_plot():
     plt.gca().auto_scale_xyz((-scale, scale), (-scale, scale), (-scale, scale))
     plt.gca().view_init(30, 120)
     plt.axis("off")
+    
+visualize_array_object_attack()
