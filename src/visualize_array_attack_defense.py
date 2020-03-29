@@ -88,4 +88,5 @@ def scale_plot():
         plt.gca().view_init(30, 60)
         plt.axis("off")
 
+# uncomment only when you want to rotate or view pointclouds in 3D
 # visualize_array_attack_defense()
