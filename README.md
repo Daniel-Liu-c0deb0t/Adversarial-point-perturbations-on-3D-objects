@@ -10,7 +10,7 @@ New distributional and shape attacks on neural networks that process 3D point cl
 }
 ```
 
-An alternative version of the code with better Jupyter support is available [here](https://github.com/TangeniThePyGuru/Adversarial-point-perturbations-on-3D-objects), which is maintained by [Tangeni M. Shikomba](https://github.com/TangeniThePyGuru).
+An alternative version of the code with better Jupyter support is available [here](https://github.com/TangeniThePyGuru/Adversarial-point-perturbations-on-3D-objects), which is separately maintained by [Tangeni M. Shikomba](https://github.com/TangeniThePyGuru).
 
 ![](schematics.png)
 
