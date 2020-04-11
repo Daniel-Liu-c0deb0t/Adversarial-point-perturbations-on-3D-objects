@@ -3,6 +3,7 @@ import numpy as np
 import importlib
 import sys
 
+
 class PointNetInterface:
     def __init__(self, max_points, fft = False, sink = None, chamfer = False):
         tf.reset_default_graph()
