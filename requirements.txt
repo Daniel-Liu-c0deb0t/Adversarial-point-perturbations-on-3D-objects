@@ -1,0 +1,5 @@
+ TensorFlow==1.4
+ Matplotlib
+ Numpy
+ Numba
+ Scipy
