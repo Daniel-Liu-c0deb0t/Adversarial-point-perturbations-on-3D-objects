@@ -10,6 +10,8 @@ New distributional and shape attacks on neural networks that process 3D point cl
 }
 ```
 
+An alternative version of the code with better Jupyter support is available [here](https://github.com/TangeniThePyGuru/Adversarial-point-perturbations-on-3D-objects), which is separately maintained by [Tangeni M. Shikomba](https://github.com/TangeniThePyGuru).
+
 ![](schematics.png)
 
 Currently, it is quite easy to generate effective adversarial attacks, in both 2D and 3D. The goal in this work is to generate adversarial examples that uses shape information intrinsic to 3D point sets. Four attacks are proposed:
