@@ -1,5 +1,7 @@
- TensorFlow==1.4
- Matplotlib
- Numpy
- Numba
- Scipy
+tensorflow-gpu==1.4.1
+matplotlib
+numpy==1.16.6
+llvmlite==0.31.0
+numba==0.47.0
+scipy
+h5py==2.10.0
