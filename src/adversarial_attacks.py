@@ -415,7 +415,7 @@ def chamfer_attack(model, x, y, params):
         for i in range(n):
             model.train_chamfer_fn(x, y, mid, lambda_, eta)
         
-        x_perturb = model.x_perturb_chamfer_fn()
+        x_perturb = model.x_perturb_chamfer_fn(x)
         
         if pred_idx == np.argmax(model.pred_fn(x_perturb)):
             hi = mid

@@ -4,9 +4,9 @@ from mpl_toolkits.mplot3d import Axes3D
 
 np.random.seed(1234)
 
-view_label = "stool"
-offset_idx = 0
-f = np.load("../output_save/final/1564208936_pointnet_iter_l2_adversarial_sticks_none.npz")
+view_label = "airplane"
+offset_idx = 2
+f = np.load("../output_save/1593762926_pointnet_iter_l2_attack_sinks_none.npz")
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 show_grads = True
 show_true = False

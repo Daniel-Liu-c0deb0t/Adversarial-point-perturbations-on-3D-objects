@@ -1,0 +1,4 @@
+output_save/
+figures/
+data/*
+!data/*.txt

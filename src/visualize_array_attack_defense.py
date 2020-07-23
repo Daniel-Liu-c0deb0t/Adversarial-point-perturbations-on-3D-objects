@@ -36,7 +36,7 @@ paths = [
     ]
 ]
 
-xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Distributional", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
+xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Gradient proj.", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
 ylabels = ["None", "Remove outliers", "Remove salient"]
 
 model = "stool"

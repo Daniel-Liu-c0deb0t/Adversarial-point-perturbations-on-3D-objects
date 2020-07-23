@@ -1,25 +1,27 @@
+import matplotlib
+import matplotlib.font_manager
+matplotlib.rcParams["font.family"] = ["serif"]
+matplotlib.rcParams["font.serif"] = ["Times New Roman"]
+
 from matplotlib import pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
-plt.rcParams["text.usetex"] = True
-plt.rcParams["text.latex.unicode"] = True
-
 # attacks
 paths = [
-    "../output_save/1582094622_pointnet_none_none.npz",
-    "../output_save/1582096639_pointnet_iter_l2_attack_none.npz",
-    "../output_save/1582508068_pointnet_chamfer_attack_none.npz",
-    "../output_save/1582152554_pointnet_iter_l2_attack_n_proj_none.npz",
-    "../output_save/1582182744_pointnet_iter_l2_attack_n_sampling_none.npz",
-    "../output_save/1582186116_pointnet_iter_l2_adversarial_sticks_none.npz",
-    "../output_save/1582453960_pointnet_iter_l2_attack_sinks_none.npz"
+    "../output_save/1593245844_pointnet_none_none.npz",
+    "../output_save/1593254536_pointnet_iter_l2_attack_none.npz",
+    "../output_save/1593778176_pointnet_chamfer_attack_none.npz",
+    "../output_save/1593377229_pointnet_iter_l2_attack_n_proj_none.npz",
+    "../output_save/1593534943_pointnet_iter_l2_attack_n_sampling_none.npz",
+    "../output_save/1593864032_pointnet_iter_l2_adversarial_sticks_none.npz",
+    "../output_save/1593762926_pointnet_iter_l2_attack_sinks_none.npz"
 ]
 
-xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Distributional", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
+xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Gradient Proj.", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
 
-models = ["car", "person", "lamp", "chair", "vase"]
-offset_idx = [1, 0, 0, 1, 0]
+models = ["car", "toilet", "lamp", "airplane", "vase"]
+offset_idx = [3, 1, 0, 3, 0]
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 files = []
@@ -38,7 +40,7 @@ for i, model in enumerate(models):
 plt.figure(figsize = (24, 20))
 
 def scale_plot():
-    scale = 0.7
+    scale = 0.5
     plt.gca().auto_scale_xyz((-scale, scale), (-scale, scale), (-scale, scale))
     plt.gca().view_init(30, 120)
     plt.axis("off")

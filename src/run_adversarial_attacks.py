@@ -5,6 +5,7 @@ import adversarial_defenses
 from true_proj import project_points_to_triangles
 from pointnet_interface import PointNetInterface
 from pointnet2_interface import PointNet2Interface
+from dgcnn_interface import DGCNNInterface
 import time
 import os
 import argparse
@@ -15,7 +16,8 @@ np.random.seed(1234)
 
 models = {
         "pointnet": PointNetInterface,
-        "pointnet2": PointNet2Interface
+        "pointnet2": PointNet2Interface,
+        "dgcnn": DGCNNInterface
 }
 
 attacks = {

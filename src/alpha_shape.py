@@ -3,7 +3,7 @@ from scipy.spatial import Delaunay
 from numba import jit
 from projection import cross
 
-def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.001):
+def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.0001):
     if epsilon is not None:
         # jiggle the points a little, so less holes form, as the 3D Delaunay
         # triangulation seeks to create tetrahedrons, while we want surface triangles
@@ -31,7 +31,7 @@ def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.001):
     for simplex_idx in DT.simplices:
         r = circumscribed_radius(DT.points[simplex_idx])
 
-        if r < alpha:
+        if r < alpha and r > 0.0:
             # add faces of the tetrahedron to the boundary set, and remove inner faces that are repeated
             tri_a = frozenset({simplex_idx[0], simplex_idx[1], simplex_idx[2]})
             tri_b = frozenset({simplex_idx[0], simplex_idx[1], simplex_idx[3]})
@@ -54,11 +54,16 @@ def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.001):
 # helper to compute the circumscribed circle's radius of a tetrahedron
 @jit(nopython = True)
 def circumscribed_radius(simplex):
+    epsilon = 1e-8
     a = simplex[0]
     b = simplex[1]
     c = simplex[2]
     d = simplex[3]
     V = np.abs(np.dot(b - a, cross(c - a, d - a))) / 6.0 # volume
+
+    if np.abs(V) < epsilon:
+        return 0.0
+
     dist_a = np.linalg.norm(a - b) * np.linalg.norm(c - d)
     dist_b = np.linalg.norm(a - c) * np.linalg.norm(b - d)
     dist_c = np.linalg.norm(a - d) * np.linalg.norm(b - c)

@@ -59,7 +59,7 @@ class PointNetInterface:
             dist = tf.linalg.norm(self.sink_source[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :], axis = 3)
             rbf = tf.exp(-((dist / self.epsilon) ** 2))[:, :, :, tf.newaxis]
             perturb = rbf * (sinks[:, :, tf.newaxis, :] - self.x_clean[:, tf.newaxis, :, :])
-            self.x_perturb = self.x_clean + tf.tanh(tf.reduce_sum(perturb, axis = 1))
+            self.x_perturb = self.x_clean + 0.5 * tf.tanh(tf.reduce_sum(perturb, axis = 1))
 
             with tf.variable_scope(tf.get_variable_scope(), reuse = tf.AUTO_REUSE):
                 logits, end_points = model.get_model(self.x_perturb, self.is_training)
@@ -76,10 +76,11 @@ class PointNetInterface:
             self.lambda_chamfer = tf.placeholder(tf.float32, shape = ())
             self.alpha_chamfer = tf.placeholder(tf.float32, shape = ())
             self.eta_chamfer = tf.placeholder(tf.float32, shape = ())
-            self.x_chamfer = tf.get_variable("x_chamfer", dtype = tf.float32, shape = self.x_pl.shape.as_list())
+            x_chamfer_raw = tf.get_variable("x_chamfer_raw", dtype = tf.float32, shape = self.x_pl.shape.as_list())
 
-            self.init_x_chamfer = tf.assign(self.x_chamfer, self.x_init_chamfer)
+            self.init_x_chamfer = tf.assign(x_chamfer_raw, self.x_init_chamfer)
             
+            self.x_chamfer = self.x_clean_chamfer + 0.1 * tf.tanh(x_chamfer_raw - self.x_clean_chamfer)
             dist = tf.linalg.norm(self.x_chamfer[:, :, tf.newaxis, :] - self.x_clean_chamfer[:, tf.newaxis, :, :], axis = 3)
             dist = tf.reduce_min(dist, axis = 2, keep_dims = True)
             loss_chamfer = tf.reduce_mean(dist, axis = 1, keep_dims = True)
@@ -91,8 +92,8 @@ class PointNetInterface:
             
             loss_l2 = tf.sqrt(tf.reduce_sum((self.x_chamfer - self.x_clean_chamfer) ** 2, axis = (1, 2), keep_dims = True))
             optimizer_chamfer = tf.train.AdamOptimizer(learning_rate = self.eta_chamfer)
-            self.train_chamfer = optimizer_chamfer.minimize(-loss + self.alpha_chamfer * (loss_chamfer + self.lambda_chamfer * loss_l2), var_list = [self.x_chamfer])
-            self.init_optimizer_chamfer = tf.variables_initializer([optimizer_chamfer.get_slot(self.x_chamfer, name) for name in optimizer_chamfer.get_slot_names()] + list(optimizer_chamfer._get_beta_accumulators()))
+            self.train_chamfer = optimizer_chamfer.minimize(-loss + self.alpha_chamfer * (loss_chamfer + self.lambda_chamfer * loss_l2), var_list = [x_chamfer_raw])
+            self.init_optimizer_chamfer = tf.variables_initializer([optimizer_chamfer.get_slot(x_chamfer_raw, name) for name in optimizer_chamfer.get_slot_names()] + list(optimizer_chamfer._get_beta_accumulators()))
 
     def clean_up(self):
         self.sess.close()
@@ -111,8 +112,8 @@ class PointNetInterface:
     def x_perturb_sink_fn(self, x, sink_source, epsilon, lambda_):
         return self.sess.run(self.x_perturb, feed_dict = {self.x_clean: [x], self.sink_source: [sink_source], self.epsilon: epsilon, self.lambda_: lambda_, self.is_training: False})[0].astype(float)
 
-    def x_perturb_chamfer_fn(self):
-        return self.sess.run(self.x_chamfer)[0].astype(float)
+    def x_perturb_chamfer_fn(self, x):
+        return self.sess.run(self.x_chamfer, feed_dict = {self.x_clean_chamfer: [x]})[0].astype(float)
     
     def grad_fn(self, x, y):
         return self.sess.run(self.grad_loss_wrt_x, feed_dict = {self.x_pl: [x], self.y_pl: [y], self.is_training: False})[0].astype(float)

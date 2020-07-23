@@ -33,9 +33,11 @@ This is the final directory structure of the project:
 /
     pointnet/
     pointnet2/
+    dgcnn/
     Adversarial-point-perturbations-on-3D-objects/
         pointnet/
         pointnet2/
+        dgcnn/
         src/
         data/
         output_save/
@@ -43,11 +45,11 @@ This is the final directory structure of the project:
 ```
 We will assume that an empty folder is created somewhere, and we will refer to it as the root folder, or `/`. All paths from here on are relative to the root folder.
 
-The first step is to clone three different repositories into the root folder: [PointNet](https://github.com/charlesq34/pointnet), [PointNet++](https://github.com/charlesq34/pointnet2), and this repo.
+The first step is to clone three different repositories into the root folder: [PointNet](https://github.com/charlesq34/pointnet), [PointNet++](https://github.com/charlesq34/pointnet2), [DGCNN](https://github.com/WangYueFt/dgcnn), and this repo.
 
-Then, copy the modified PointNet files from the `/Adversarial-point-perturbations-on-3D-objects/pointnet/` directory to the cloned PointNet repo `/pointnet/`, and do the same for PointNet++. The modified files contain some bug fixes and other nonessential modifications that carried over from my previous [code](https://github.com/Daniel-Liu-c0deb0t/3D-Neural-Network-Adversarial-Attacks). Other than fixing a batch norm bug for PointNet, the other changes in the modified PointNet/PointNet++ files should not be necessary for this project, but I included all changes just in case. Note that PointNet++ needs some compiled C++ code for its operations. Read the directions given in the repo and modify the bash scripts for TensorFlow 1.4.
+Then, copy the modified PointNet files from the `/Adversarial-point-perturbations-on-3D-objects/pointnet/` directory to the cloned PointNet repo `/pointnet/`, and do the same for PointNet++ and DGCNN. The modified files contain some bug fixes and other nonessential modifications that carried over from my previous [code](https://github.com/Daniel-Liu-c0deb0t/3D-Neural-Network-Adversarial-Attacks). Other than fixing a batch norm bug for PointNet and DGCNN, the other changes in the modified PointNet/PointNet++ files should not be necessary for this project, but I included all changes just in case. Note that PointNet++ needs some compiled C++ code for its operations. Read the directions given in the repo and modify the bash scripts for TensorFlow 1.4.
 
-Follow the instructions for training PointNet and PointNet++ from their respective repos. A lowered batch size of 10 was used in single-GPU training for PointNet++, for lower memory requirements. The checkpoint files should be saved in `/pointnet/log/` and `/pointnet2/log/` for PointNet and PointNet++.
+Follow the instructions for training PointNet, PointNet++, and DGCNN from their respective repos. A lowered batch size of 10 was used in single-GPU training for PointNet++, for lower memory requirements. The checkpoint files should be saved in `/pointnet/log/`, `/pointnet2/log/`, and `/dgcnn/tensorflow/log/` for PointNet, PointNet++, and DGCNN.
 
 Next, assuming that the current working directory is `/`, do the following:
 ```
@@ -97,4 +99,6 @@ Adjusting parameters is mainly accomplished by editing the hardcoded values in t
 cd /
 python -u Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_examples.py
 ```
-The `run_old_adversarial_examples.py` script automatically goes through the attacks and defenses on PointNet. When adjusting parameters, note that the names of some parameters do not match the variables used in the paper, but the parameters' default values are the same as those reported in the paper. Each unique combination of network, attack, and defense generates a unique file in the `output_size` folder that contains saved clean/adversarial examples. All statistics are printed to stdout. Running all experiments may take a **long** time. Comment out the blocks starting with `if defense_name == "none":` will drastically speed up the process. This is because computing the Hausdorff distance with the true shape (triangular mesh) is very slow.
+The `run_old_adversarial_examples.py` script automatically goes through the attacks and defenses on PointNet. When adjusting parameters, note that the names of some parameters do not match the variables used in the paper, but the parameters' default values are the same as those reported in the paper. Each unique combination of network, attack, and defense generates a unique file in the `output_size` folder that contains saved clean/adversarial examples. All statistics are printed to stdout. Running all experiments may take a **long** time. Comment out the blocks starting with `if defense_name == "none":` will drastically speed up the process. This is because computing the Hausdorff distance with the true shape (triangular mesh) is very slow. This commented out by default.
+
+**Implementation notes:** Perturbation resampling's alpha shape triangulation algorithm may create holes in the mesh. It should be tuned better or another algorithm should be used for future work.

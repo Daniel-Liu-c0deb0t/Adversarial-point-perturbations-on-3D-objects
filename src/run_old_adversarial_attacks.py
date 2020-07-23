@@ -5,6 +5,7 @@ import adversarial_defenses
 from true_proj import project_points_to_triangles
 from pointnet_interface import PointNetInterface
 from pointnet2_interface import PointNet2Interface
+from dgcnn_interface import DGCNNInterface
 import time
 import os
 
@@ -14,46 +15,68 @@ np.random.seed(1234)
 
 models = (
         ("pointnet", PointNetInterface),
-        ("pointnet2", PointNet2Interface)
+        ("pointnet2", PointNet2Interface),
+        ("dgcnn", DGCNNInterface)
 )
 
 test_models = (0,)
+#test_models = (1,)
+#test_models = (2,)
 
 attacks = (
         ("none", lambda _a, x, _b, _c: x, {}),
         ("iter_l2_attack_1_proj", adversarial_attacks.iter_l2_attack_1_proj, {"epsilon": 1.0, "n": 10, "tau": 0.05}),
-        ("iter_l2_attack", adversarial_attacks.iter_l2_attack, {"epsilon": 2.0, "n": 20}),
+        #("iter_l2_attack", adversarial_attacks.iter_l2_attack, {"epsilon": 1.0, "n": 100}),
+        ("iter_l2_attack", adversarial_attacks.iter_l2_attack, {"epsilon": 2.0, "n": 100}),
+        #("iter_l2_attack", adversarial_attacks.iter_l2_attack, {"epsilon": 3.0, "n": 100}),
         ("mom_l2_attack", adversarial_attacks.mom_l2_attack, {"epsilon": 1.0, "mu": 1.0, "n": 10}),
         ("normal_jitter", adversarial_attacks.normal_jitter, {"epsilon": 1.0, "tau": 0.05}),
         ("iter_l2_attack_n_proj", adversarial_attacks.iter_l2_attack_n_proj, {"epsilon": 1.0, "n": 20, "tau": 0.05}),
         ("mom_l2_attack_n_proj", adversarial_attacks.mom_l2_attack_n_proj, {"epsilon": 1.0, "mu": 1.0, "n": 10, "tau": 0.05}),
         ("iter_l2_attack_1_sampling", adversarial_attacks.iter_l2_attack_1_sampling, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": True}),
         ("iter_l2_attack_1_sampling_all", adversarial_attacks.iter_l2_attack_1_sampling_all, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "tri_all_points": True}),
-        ("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 2.0, "n": 20, "k": 500, "kappa": 10, "tri_all_points": True}),
+        #("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 2.0, "n": 100, "k": 0, "kappa": 10, "tri_all_points": True}),
+        #("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 2.0, "n": 100, "k": 250, "kappa": 10, "tri_all_points": True}),
+        #("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 1.0, "n": 100, "k": 500, "kappa": 10, "tri_all_points": True}),
+        ("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 2.0, "n": 100, "k": 500, "kappa": 10, "tri_all_points": True}),
+        #("iter_l2_attack_n_sampling", adversarial_attacks.iter_l2_attack_n_sampling, {"epsilon": 3.0, "n": 100, "k": 500, "kappa": 10, "tri_all_points": True}),
         ("iter_l2_attack_1_sampling_rbf", adversarial_attacks.iter_l2_attack_1_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_n_sampling_rbf", adversarial_attacks.iter_l2_attack_n_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_top_k", adversarial_attacks.iter_l2_attack_top_k, {"epsilon": 3.0, "n": 10, "top_k": 10}),
-        ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 20, "top_k": 30, "sigma": 200}),
+        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 100, "top_k": 100, "sigma": 0}),
+        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 100, "top_k": 100, "sigma": 200}),
+        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 1.0, "n": 100, "top_k": 100, "sigma": 400}),
+        ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 100, "top_k": 100, "sigma": 400}),
+        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 3.0, "n": 100, "top_k": 100, "sigma": 400}),
         ("iter_l2_attack_fft", adversarial_attacks.iter_l2_attack_fft, {"epsilon": 20.0, "n": 10}),
-        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 5.0, "lambda_": 10000.0, "n": 20, "num_sinks": 30}),
+        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 7.0, "lambda_": 10000.0, "n": 20, "num_sinks": 20}),
         ("chamfer_attack", adversarial_attacks.chamfer_attack, {"eta": 0.1, "alpha": 10000.0, "lambda_": 0.002, "n": 20})
 )
 
 fft = False
-sink = 30
+sink = 20
 chamfer = True
 
 test_attacks = (0, 2, 5, 9, 13, 15, 16)
 
 defenses = (
         ("none", lambda _a, x, _b: x, {}),
+        #("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 0.0}),
+        #("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 0.5}),
         ("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 1.0}),
+        #("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 1.5}),
+        #("remove_outliers_defense", adversarial_defenses.remove_outliers_defense, {"top_k": 10, "num_std": 2.0}),
+        #("remove_salient_defense", adversarial_defenses.remove_salient_defense, {"top_k": 100}),
         ("remove_salient_defense", adversarial_defenses.remove_salient_defense, {"top_k": 200}),
-        ("random_perturb_defense", adversarial_defenses.random_perturb_defense, {"std": 0.05}),
+        #("remove_salient_defense", adversarial_defenses.remove_salient_defense, {"top_k": 300}),
+        #("remove_salient_defense", adversarial_defenses.remove_salient_defense, {"top_k": 400}),
+        #("remove_salient_defense", adversarial_defenses.remove_salient_defense, {"top_k": 500}),
+        #("random_perturb_defense", adversarial_defenses.random_perturb_defense, {"std": 0.05}),
         ("random_remove_defense", adversarial_defenses.random_remove_defense, {"num_points": 200})
 )
 
-test_defenses = (0, 1, 2, 3, 4)
+test_defenses = (0, 1, 2, 3)
+#test_defenses = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 
 class_names_path = "Adversarial-point-perturbations-on-3D-objects/data/shape_names.txt"
 input_data_path = "Adversarial-point-perturbations-on-3D-objects/data/point_clouds.hdf5"
