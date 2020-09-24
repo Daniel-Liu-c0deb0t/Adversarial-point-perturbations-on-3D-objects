@@ -43,21 +43,24 @@ attacks = (
         ("iter_l2_attack_1_sampling_rbf", adversarial_attacks.iter_l2_attack_1_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_n_sampling_rbf", adversarial_attacks.iter_l2_attack_n_sampling_rbf, {"epsilon": 3.0, "n": 10, "k": 500, "kappa": 10, "num_farthest": None, "shape": 5.0}),
         ("iter_l2_attack_top_k", adversarial_attacks.iter_l2_attack_top_k, {"epsilon": 3.0, "n": 10, "top_k": 10}),
-        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 100, "top_k": 100, "sigma": 0}),
-        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 100, "top_k": 100, "sigma": 200}),
-        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 1.0, "n": 100, "top_k": 100, "sigma": 400}),
         ("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 2.0, "n": 100, "top_k": 100, "sigma": 400}),
-        #("iter_l2_adversarial_sticks", adversarial_attacks.iter_l2_adversarial_sticks, {"epsilon": 3.0, "n": 100, "top_k": 100, "sigma": 400}),
+        #("iter_l2_adversarial_sticks2", adversarial_attacks.iter_l2_adversarial_sticks2, {"eta": 0.1, "alpha": 10000.0, "lambda_": 0.01, "n": 20, "top_k": 100, "sigma": 300, "density": 0.5}),
+        ("iter_l2_adversarial_sticks2", adversarial_attacks.iter_l2_adversarial_sticks2, {"eta": 0.1, "alpha": 10000.0, "lambda_": 0.01, "n": 20, "top_k": 100, "sigma": 300, "density": 2.0}),
+        #("iter_l2_adversarial_sticks2", adversarial_attacks.iter_l2_adversarial_sticks2, {"eta": 0.1, "alpha": 10000.0, "lambda_": 0.01, "n": 20, "top_k": 100, "sigma": 300, "density": 3.5}),
         ("iter_l2_attack_fft", adversarial_attacks.iter_l2_attack_fft, {"epsilon": 20.0, "n": 10}),
-        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 7.0, "lambda_": 10000.0, "n": 20, "num_sinks": 20}),
-        ("chamfer_attack", adversarial_attacks.chamfer_attack, {"eta": 0.1, "alpha": 10000.0, "lambda_": 0.002, "n": 20})
+        #("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 2.0, "lambda_": 10000.0, "n": 20, "num_sinks": 30}),
+        ("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 7.0, "lambda_": 10000.0, "n": 20, "num_sinks": 30}),
+        #("iter_l2_attack_sinks", adversarial_attacks.iter_l2_attack_sinks, {"eta": 0.1, "mu": 12.0, "lambda_": 10000.0, "n": 20, "num_sinks": 30}),
+        ("chamfer_attack", adversarial_attacks.chamfer_attack, {"eta": 0.1, "alpha": 10000.0, "lambda_": 0.002, "n": 20}),
+        ("iter_l2_attack_dropout", adversarial_attacks.iter_l2_attack_dropout, {"epsilon": 2.0, "n": 100})
 )
 
 fft = False
-sink = 20
+sink = 30
+sticks = 100
 chamfer = True
 
-test_attacks = (0, 2, 5, 9, 13, 15, 16)
+test_attacks = (0, 2, 5, 9, 14, 16, 17, 18)
 
 defenses = (
         ("none", lambda _a, x, _b: x, {}),
@@ -99,7 +102,7 @@ with h5py.File(input_data_path, "r") as file:
 for model_idx in test_models:
     model_name = models[model_idx][0]
     model_type = models[model_idx][1]
-    model = model_type(max_points, fft = fft, sink = sink, chamfer = chamfer)
+    model = model_type(max_points, fft = fft, sink = sink, sticks = sticks, chamfer = chamfer)
 
     for attack_idx in test_attacks:
         attack_name = attacks[attack_idx][0]

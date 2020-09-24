@@ -84,6 +84,27 @@ def farthest_point(sampled_points, initial_points, num_points):
     return curr_points
 
 @jit(nopython = True)
+def farthest_point_idx(sampled_points, initial_points, num_points):
+    curr_points = np.empty(num_points, dtype = np.int64)
+    dists = np.full(len(sampled_points), np.inf)
+
+    if initial_points is None:
+        dists = np.minimum(dists, norm(sampled_points - sampled_points[0].reshape((1, -1))))
+        curr_points[0] = 0
+        start_idx = 1
+    else:
+        for i in range(len(initial_points)):
+            dists = np.minimum(dists, norm(sampled_points - initial_points[i].reshape((1, -1))))
+
+        start_idx = 0
+
+    for i in range(start_idx, num_points):
+        curr_points[i] = np.argmax(dists)
+        dists = np.minimum(dists, norm(sampled_points - sampled_points[curr_points[i]].reshape((1, -1))))
+
+    return curr_points
+
+@jit(nopython = True)
 def farthest_point_sampling(triangles, initial_points, num_points, kappa):
     sampled_points = sample_points(triangles, kappa * num_points)
     return farthest_point(sampled_points, initial_points, num_points)
@@ -136,7 +157,7 @@ def radial_basis_sampling(triangles, initial_points, num_points, kappa, num_fart
 
 @jit(nopython = True)
 def sample_on_line_segments(x, x_perturb, sigma):
-    small_perturb = 0.01
+    small_perturb = 0.003
     norms = norm(x_perturb - x)
     prefix = []
 

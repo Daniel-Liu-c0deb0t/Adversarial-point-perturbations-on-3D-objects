@@ -11,17 +11,17 @@ from mpl_toolkits.mplot3d import Axes3D
 paths = [
     "../output_save/1593245844_pointnet_none_none.npz",
     "../output_save/1593254536_pointnet_iter_l2_attack_none.npz",
-    "../output_save/1593778176_pointnet_chamfer_attack_none.npz",
+    "../output_save/1599979996_pointnet_chamfer_attack_none.npz",
     "../output_save/1593377229_pointnet_iter_l2_attack_n_proj_none.npz",
-    "../output_save/1593534943_pointnet_iter_l2_attack_n_sampling_none.npz",
-    "../output_save/1593864032_pointnet_iter_l2_adversarial_sticks_none.npz",
-    "../output_save/1593762926_pointnet_iter_l2_attack_sinks_none.npz"
+    "../output_save/1596220578_pointnet_iter_l2_attack_n_sampling_none.npz",
+    "../output_save/1600266920_pointnet_iter_l2_adversarial_sticks2_none.npz",
+    "../output_save/1599968684_pointnet_iter_l2_attack_sinks_none.npz"
 ]
 
 xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Gradient Proj.", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
 
-models = ["car", "toilet", "lamp", "airplane", "vase"]
-offset_idx = [3, 1, 0, 3, 0]
+models = ["car", "toilet", "lamp", "airplane", "bed"]
+offset_idx = [3, 1, 1, 0, 0]
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 files = []

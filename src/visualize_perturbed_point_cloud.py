@@ -5,10 +5,10 @@ from mpl_toolkits.mplot3d import Axes3D
 np.random.seed(1234)
 
 view_label = "airplane"
-offset_idx = 2
-f = np.load("../output_save/1593762926_pointnet_iter_l2_attack_sinks_none.npz")
+offset_idx = 1
+f = np.load("../output_save/1599983066_pointnet_iter_l2_attack_dropout_none.npz")
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
-show_grads = True
+show_grads = False
 show_true = False
 
 x = f["x"]
@@ -19,6 +19,7 @@ y_adv_pred = f["y_adv_pred"]
 y_adv_pred_idx = np.argmax(y_adv_pred, axis = 1)
 grad_adv = f["grad_adv"]
 
+print("NAN:", np.any(np.isnan(x)))
 print("Shape:", x.shape)
 print("Labels:", [shape_names[idx] for idx in np.unique(y_pred_idx)])
 print("Successful attacks:", np.count_nonzero(y_pred_idx != y_adv_pred_idx))

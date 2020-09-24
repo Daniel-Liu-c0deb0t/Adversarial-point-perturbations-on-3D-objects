@@ -1,5 +1,5 @@
 # Adversarial point perturbations on 3D objects
-New distributional and shape attacks on neural networks that process 3D point cloud data. Preprint paper: **[here](https://arxiv.org/abs/1908.06062)**. If you use this code, please cite
+New distributional and shape attacks on neural networks that process 3D point cloud data. Preprint paper: **[here](https://arxiv.org/abs/1908.06062)**. The paper has been accepted to the 2020 ECCV Workshop on Adversarial Robustness in the Real World. If you use this code, please cite
 
 ```
 @article{liu2019adversarial,
@@ -70,7 +70,7 @@ The triangle each point was sampled from are included in the HDF5 file.
 In this project, there are two types of runnable scripts in the `src` folder: visualization scripts and experiment scripts.
 
 Experiment scripts:
-- `run_adversarial_examples.py`
+- `run_adversarial_examples.py` (**Do not use, very outdated!**)
 - `run_old_adversarial_examples.py`
 
 Visualization scripts:
@@ -101,4 +101,4 @@ python -u Adversarial-point-perturbations-on-3D-objects/src/run_old_adversarial_
 ```
 The `run_old_adversarial_examples.py` script automatically goes through the attacks and defenses on PointNet. When adjusting parameters, note that the names of some parameters do not match the variables used in the paper, but the parameters' default values are the same as those reported in the paper. Each unique combination of network, attack, and defense generates a unique file in the `output_size` folder that contains saved clean/adversarial examples. All statistics are printed to stdout. Running all experiments may take a **long** time. Comment out the blocks starting with `if defense_name == "none":` will drastically speed up the process. This is because computing the Hausdorff distance with the true shape (triangular mesh) is very slow. This commented out by default.
 
-**Implementation notes:** Perturbation resampling's alpha shape triangulation algorithm may create holes in the mesh. It should be tuned better or another algorithm should be used for future work.
+**Implementation notes:** Perturbation resampling's alpha shape triangulation algorithm does not produce the best meshes. Another algorithm should be used for future work.

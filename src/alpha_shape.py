@@ -3,12 +3,13 @@ from scipy.spatial import Delaunay
 from numba import jit
 from projection import cross
 
-def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.0001):
+def alpha_shape_border(x, alpha_std = 0.0, epsilon = 0.003):
     if epsilon is not None:
         # jiggle the points a little, so less holes form, as the 3D Delaunay
         # triangulation seeks to create tetrahedrons, while we want surface triangles
         x_perturbed = x + epsilon * np.random.random(x.shape) * np.random.choice(np.array([-1, 1]), size = x.shape)
-        x = np.concatenate((x, x_perturbed))
+        x_perturbed2 = x + epsilon * np.random.random(x.shape) * np.random.choice(np.array([-1, 1]), size = x.shape)
+        x = np.concatenate((x, x_perturbed, x_perturbed2))
 
     triangles = set() # set of sets of 3D points (tuples)
     DT = Delaunay(x) # 3D Delaunay triangulation
