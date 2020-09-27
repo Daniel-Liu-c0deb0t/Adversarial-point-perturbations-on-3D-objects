@@ -427,7 +427,7 @@ def chamfer_attack(model, x, y, params):
     hi = float(alpha)
     res = x
     
-    # binary search for lambda
+    # binary search for alpha
     for _ in range(20):
         mid = (lo + hi) / 2.0
         
@@ -468,7 +468,7 @@ def iter_l2_adversarial_sticks2(model, x, y, params):
     hi = float(alpha)
     res = x
 
-    # binary search for lambda
+    # binary search for alpha
     for _ in range(20):
         mid = (lo + hi) / 2.0
         
@@ -512,7 +512,7 @@ def chamfer_dropout(model, x, y, params):
     hi = float(alpha)
     res = x
 
-    # binary search for lambda
+    # binary search for alpha
     for _ in range(20):
         mid = (lo + hi) / 2.0
 
