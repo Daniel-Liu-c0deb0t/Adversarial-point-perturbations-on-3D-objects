@@ -20,8 +20,8 @@ paths = [
 
 xlabels = ["None", "Iter. gradient $L_2$", "Chamfer", "Gradient Proj.", "Perturb. resample", "Adv. sticks", "Adv. sinks"]
 
-models = ["car", "toilet", "lamp", "airplane", "bed"]
-offset_idx = [3, 1, 1, 0, 0]
+models = ["sink", "toilet", "lamp", "airplane", "bed"]
+offset_idx = [0, 1, 1, 0, 0]
 shape_names = [line.rstrip() for line in open("../data/shape_names.txt")]
 
 files = []
